@@ -4,6 +4,11 @@ globs: "*.ts, *.tsx, *.html, *.css, *.js, *.jsx, package.json"
 alwaysApply: false
 ---
 
+## Learning Mode Rules
+- Rule 1: User is in learning mode - provide step-by-step, detailed guidance
+- Rule 2: DO NOT write code or provide code snippets to copy-paste. Only give instructions like "make a function to do X". Point out bugs when asked, but don't fix them unless explicitly requested.
+- Rule 3: After each task completion, check the work before proceeding to next step
+
 Default to using Bun instead of Node.js.
 
 - Use `bun <file>` instead of `node <file>` or `ts-node <file>`

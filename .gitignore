@@ -1,5 +1,9 @@
 # dependencies (bun install)
 node_modules
+CLAUDE.md
+.wwebjs_auth
+.wwebjs_cache
+.cursor
 
 # output
 out
