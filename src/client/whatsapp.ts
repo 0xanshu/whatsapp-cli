@@ -18,8 +18,12 @@ client.on("authenticated", () => {
 });
 
 client.on("message", (message) => {
+  let status = "Unread";
+  if (message.ack >= 3) {
+    status = "Read";
+  }
   console.log(
-    `From: ${message._data.notifyName || message.from} => ${message.body}`,
+    `From: ${message._data.notifyName || message.from} => ${message.body} => Status: ${status}`,
   );
 });
 
