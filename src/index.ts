@@ -4,7 +4,8 @@ wsp.initialize();
 
 wsp.on("ready", async () => {
   try {
-    await wsp.sendMessage("918920228276@c.us", "Hello from my CLI!");
+    await wsp.sendMessage("916353300979@c.us", "Hello from my CLI!");
+    console.log("Message Sent");
   } catch (error) {
     console.log("Failed to send message: ", error);
   }
