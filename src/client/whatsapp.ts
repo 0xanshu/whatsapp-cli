@@ -57,9 +57,8 @@ client.on("message", (message) => {
     status = "Read";
   }
   console.log(
-    `From: ${message._data.notifyName || message.from} => ${message.from} => ${message.body} => Status: ${status}`,
+    `From: ${message._data.notifyName || message.from} => ${message.body} => Status: ${status}`,
   );
-  console.log(`To ${message.fromMe} => ${message.body}`);
 });
 
 export default client;
