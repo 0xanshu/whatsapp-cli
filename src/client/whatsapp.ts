@@ -1,8 +1,6 @@
 import ww from "whatsapp-web.js";
 import qr from "qrcode-terminal";
 
-// console.log(ww);
-
 let client = new ww.Client({
   authStrategy: new ww.LocalAuth(),
 });
@@ -56,9 +54,6 @@ client.on("message", (message) => {
   if (message.ack >= 3) {
     status = "Read";
   }
-  console.log(
-    `From: ${message._data.notifyName || message.from} => ${message.body} => Status: ${status}`,
-  );
 });
 
 export default client;

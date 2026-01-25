@@ -4,6 +4,7 @@
   "type": "module",
   "private": true,
   "devDependencies": {
+    "@types/blessed": "^0.1.27",
     "@types/bun": "latest",
     "@types/node": "^25.0.9",
     "@types/prompts": "^2.4.9",
