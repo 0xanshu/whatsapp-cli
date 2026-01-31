@@ -3,8 +3,10 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
+  "scripts": {
+    "dev": "bun src/index.ts"
+  },
   "devDependencies": {
-    "@types/blessed": "^0.1.27",
     "@types/bun": "latest",
     "@types/node": "^25.0.9",
     "@types/prompts": "^2.4.9",
@@ -15,8 +17,9 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@opentui/core": "^0.1.75",
     "prompts": "^2.4.2",
     "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "^1.34.4"
+    "whatsapp-web.js": "^1.34.6"
   }
 }

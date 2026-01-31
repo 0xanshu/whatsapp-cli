@@ -1,9 +1,19 @@
-function renderChatList(box, chats) {
-  let chatListString = "";
-  for (let i = 0; i < Math.min(15, chats.length); i++) {
-    chatListString += `${i + 1}. ${chats[i].name} \n ${chats[i].lastMessage?.body}\n\n`;
-  }
-  box.setContent(chatListString || "No chats found");
+import { Select, Box, Text } from "@opentui/core";
+
+function renderChatList(chats: any[]) {
+  const selectComponent = Select({
+    width: "100%",
+    height: "100%",
+    top: 0,
+    left: 0,
+    options: chats.map((chat) => ({
+      name: chat.name || chat.id.user || "Unknown",
+      description: chat.lastMessage?.body || "No messages yet",
+    })),
+  });
+  return selectComponent;
 }
 
-export { renderChatList };
+async function renderConvoList(chats: any[], chatIndex: number) {}
+
+export { renderChatList, renderConvoList };

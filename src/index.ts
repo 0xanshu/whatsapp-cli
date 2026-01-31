@@ -1,59 +1,72 @@
 import wsp from "./client/whatsapp.ts";
-import { listChats, displayChats, selectChats } from "./chat.ts";
-import prompts from "prompts";
-import {
-  createScreen,
-  createChatListBox,
-  createConversationBox,
-} from "./ui/screen.ts";
-import { renderChatList } from "./ui/components/chatList.ts";
+import { listChats } from "./chat.ts";
+import { createOpenTuiApp } from "./ui/screen.ts";
+import { renderChatList, renderConvoList } from "./ui/components/chatList.ts";
+import { Box, Text } from "@opentui/core";
 
-wsp.initialize();
+console.log(">>> [INDEX] Module loaded, setting up event listeners...");
 
 wsp.on("ready", async () => {
-  const screen = createScreen();
-  const chatListBox = createChatListBox(screen);
-  const convoBox = createConversationBox(screen);
+  console.log(">>> [INDEX.TS] Ready event fired!");
+  console.log(">>> Starting TUI setup...");
 
   try {
-    chatListBox.setContent("Loading chats...");
-    screen.render();
-
+    console.log(">>> About to fetch chats...");
     const chats = await listChats(wsp);
+    console.log(">>> Chats loaded:", chats?.length);
 
-    chatListBox.setContent(`Found ${chats?.length || 0} chats. Rendering...`);
-    screen.render();
+    console.log(">>> Creating renderer...");
+    const renderer = await createOpenTuiApp();
+    console.log(">>> Renderer created");
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    console.log(">>> Rendering chat list...");
+    const chatListComponent = renderChatList(chats);
+    console.log(">>> Chat list component created");
 
-    if (!chats || chats.length === 0) {
-      chatListBox.setContent("No chats found");
-    } else {
-      renderChatList(chatListBox, chats);
-    }
-
-    screen.render();
-  } catch (err) {
-    chatListBox.setContent(`Error: ${err.message}`);
-    screen.render();
+    console.log(">>> Adding component to renderer...");
+    renderer.root.add(chatListComponent);
+    console.log(">>> Component added to renderer");
+    console.log(">>> TUI setup complete!");
+  } catch (error) {
+    console.error(">>> Error during setup:", error);
+    console.error(">>> Stack trace:", (error as Error).stack);
+    throw error;
   }
-
-  // let sendAnotherMessage = {
-  //   value: "true",
-  // };
-  // while (sendAnotherMessage.value) {
-  //   await displayChats(chats);
-  //   await selectChats(wsp, chats);
-
-  //   sendAnotherMessage = await prompts({
-  //     type: "confirm",
-  //     name: "value",
-  //     message: "Do you want to send another message?",
-  //   });
-  // }
-  // await wsp.destroy();
-  // process.exit(0);
 });
 
-// console.log("Whatsapp CLI starting...");
-``;
+console.log(">>> [INDEX] Ready listener attached, now initializing client...");
+wsp.initialize();
+
+// Timeout check: if ready doesn't fire in 60 seconds, something is wrong
+let readyFired = false;
+wsp.on("ready", () => {
+  readyFired = true;
+});
+
+setTimeout(() => {
+  if (!readyFired) {
+    console.error(
+      ">>> [INDEX] WARNING: 'ready' event has not fired after 60 seconds!",
+    );
+    console.error(">>> This usually means:");
+    console.error(">>>   1. WhatsApp Web failed to load in the browser");
+    console.error(">>>   2. Network connectivity issues");
+    console.error(">>>   3. WhatsApp service is down");
+    console.error(">>> Try restarting the application.");
+  }
+}, 60000);
+
+// let sendAnotherMessage = {
+//   value: "true",
+// };
+// while (sendAnotherMessage.value) {
+//   await displayChats(chats);
+//   await selectChats(wsp, chats);
+//   sendAnotherMessage = await prompts({
+//     type: "confirm",
+//     name: "value",
+//     message: "Do you want to send another message?",
+//   });
+// }
+// await wsp.destroy();
+// process.exit(0);

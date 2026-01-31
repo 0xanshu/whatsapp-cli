@@ -1,42 +1,11 @@
-import blessed from "blessed";
+import { createCliRenderer, Box, Text } from "@opentui/core";
 
-function createScreen() {
-  const screen = blessed.screen({
-    smartCSR: true,
-    title: "WhatsApp CLI",
-    // terminal: "xterm-256color",
+async function createOpenTuiApp() {
+  const renderer = await createCliRenderer({
+    exitOnCtrlC: true,
   });
-  screen.key(["q", "C-c"], () => {
-    return process.exit(0);
-  });
-  screen.render();
-  return screen;
+
+  return renderer;
 }
 
-function createChatListBox(screen) {
-  const box = blessed.box({
-    top: 0,
-    left: 0,
-    width: "30%",
-    height: "100%",
-    border: { type: "line" },
-    label: "Chats",
-  });
-  screen.append(box);
-  return box;
-}
-
-function createConversationBox(screen) {
-  const box = blessed.box({
-    top: 0,
-    left: "30%",
-    width: "70%",
-    height: "100%",
-    border: { type: "line" },
-    label: "Conversation",
-  });
-  screen.append(box);
-  return box;
-}
-
-export { createScreen, createChatListBox, createConversationBox };
+export { createOpenTuiApp };
