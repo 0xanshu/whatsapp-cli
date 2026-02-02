@@ -1,24 +1,27 @@
 import ww from "whatsapp-web.js";
 import qr from "qrcode-terminal";
 
-let client = new ww.Client({
-  authStrategy: new ww.LocalAuth(),
-  puppeteer: {
-    headless: true,
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-accelerated-2d-canvas",
-      "--no-first-run",
-      "--no-zygote",
-      "--disable-gpu",
-    ],
-  },
-  webVersionCache: {
-    type: "none",
-  },
-});
+let client: ww.Client;
+try {
+  client = new ww.Client({
+    authStrategy: new ww.LocalAuth(),
+    puppeteer: {
+      headless: true,
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-accelerated-2d-canvas",
+        "--no-first-run",
+        "--no-zygote",
+        "--disable-gpu",
+      ],
+    },
+  });
+} catch (error) {
+  console.error(">>> Error initializing WhatsApp client:", error);
+  throw error;
+}
 
 const largeArt = `\x1b[32m
  ___       __   ___  ___  ________  _________  ________  ________  ________  ________
@@ -77,26 +80,6 @@ client.on("auth_failure", (message) => {
   console.error(">>> Authentication failure:", message);
 });
 
-client.on("message", (message) => {
-  let status = "Unread";
-  if (message.ack >= 3) {
-    status = "Read";
-  }
-});
-
-const events = [
-  "qr",
-  "authenticated",
-  "ready",
-  "loading_screen",
-  "disconnected",
-  "auth_failure",
-  "change_state",
-];
-console.log(`>>> [CLIENT] Monitoring events: ${events.join(", ")}`);
-
-client.on("change_state", (state) => {
-  console.log(`>>> [CLIENT] State changed to: ${state}`);
-});
+// client.on("message", (message) => {});
 
 export default client;
