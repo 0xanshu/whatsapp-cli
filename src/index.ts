@@ -1,12 +1,10 @@
 import wsp from "./client/whatsapp.ts";
 import { listChats } from "./chat.ts";
 import { createOpenTuiApp } from "./ui/screen.ts";
-import { Box, Text } from "@opentui/core";
 import { renderWhatsAppUI } from "./ui/components/layout.ts";
 
 let readyFired = false;
 
-// IMPORTANT: Attach event listeners BEFORE calling initialize()
 wsp.on("ready", async () => {
   console.log(">>> [INDEX.TS] Ready event fired!");
   readyFired = true;
@@ -23,6 +21,15 @@ wsp.on("ready", async () => {
     console.log(">>> Chats loaded:", chats.length);
 
     const renderer = await createOpenTuiApp();
+    renderer.keyInput.on("keypress", (key) => {
+      if (key.name === "`") {
+        renderer.console.toggle();
+      }
+
+      if (key.ctrl && key.name === "l") {
+        renderer.console.toggle();
+      }
+    });
 
     await renderWhatsAppUI(renderer, chats);
     renderer.start();

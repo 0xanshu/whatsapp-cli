@@ -10,6 +10,14 @@ function renderChatList(chats: WAWebJS.Chat[]) {
       description: chat.lastMessage?.body || "No messages yet",
     })),
   });
+
+  console.log("selectComponent type:", typeof selectComponent);
+  console.log("selectComponent keys:", Object.keys(selectComponent));
+  console.log(
+    "selectComponent.selectedIndex:",
+    (selectComponent as any).selectedIndex,
+  );
+
   return selectComponent;
 }
 
@@ -17,20 +25,36 @@ async function renderConvoList(
   chats: Awaited<ReturnType<WAWebJS.Client["getChats"]>>,
   chatIndex: number,
 ) {
-  let chatContact = await chats[chatIndex]?.getContact();
-  let chatData = await chatContact?.getChat();
-  const chatContent = chatData
-    ? `Chat: ${chatData.name || "Unknown"}\n\nLast Message: ${chatData.lastMessage?.body || "No messages"}`
-    : "No chat data available";
+  const idx =
+    typeof chatIndex === "number"
+      ? Math.max(0, Math.min(chatIndex, (chats?.length ?? 0) - 1))
+      : 0;
+  const chat = chats[idx];
+
+  if (!chat) {
+    const isLoading = Array.isArray(chats) && chats.length === 0;
+    const scrollComponent = ScrollBox(
+      {
+        width: "70%",
+        height: "100%",
+      },
+      Text({ content: isLoading ? "Loading chats..." : "Chat not found" }),
+    );
+    return scrollComponent;
+  }
+
+  const messages = await chat.fetchMessages({ limit: 100 });
+  const chatContent = messages
+    .map((msg) => `${msg.from}: ${msg.body}`)
+    .join("\n");
 
   const scrollComponent = ScrollBox(
     {
       width: "70%",
       height: "100%",
     },
-    Text({ content: chatContent }),
+    Text({ content: chatContent || "No messages in this chat" }),
   );
-
   return scrollComponent;
 }
 

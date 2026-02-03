@@ -3,7 +3,6 @@ import { createCliRenderer, Box, Text } from "@opentui/core";
 async function createOpenTuiApp() {
   try {
     const renderer = await createCliRenderer({
-      exitOnCtrlC: true,
       useMouse: true,
       enableMouseMovement: true,
     });
