@@ -27,11 +27,11 @@ async function renderWhatsAppUI(renderer: CliRenderer, chats: WAWebJS.Chat[]) {
     initialIndex = 0;
   }
 
-  // if (Array.isArray(chats) && chats.length > 0) {
-  //   initialIndex = Math.max(0, Math.min(initialIndex, chats.length - 1));
-  // } else {
-  initialIndex = 0;
-  // }
+  if (Array.isArray(chats) && chats.length > 0) {
+    initialIndex = Math.max(0, Math.min(initialIndex, chats.length - 1));
+  } else {
+    initialIndex = 0;
+  }
 
   let currentConvoComponent = await renderConvoList(
     renderer,

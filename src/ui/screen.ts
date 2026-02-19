@@ -5,6 +5,7 @@ async function createOpenTuiApp() {
     const renderer = await createCliRenderer({
       useMouse: true,
       enableMouseMovement: true,
+      backgroundColor: "transparent",
     });
 
     return renderer;

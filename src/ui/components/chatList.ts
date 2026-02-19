@@ -1,6 +1,4 @@
 import {
-  ScrollBox,
-  Text,
   SelectRenderable,
   CliRenderer,
   ScrollBoxRenderable,
@@ -13,6 +11,9 @@ function renderChatList(renderer: CliRenderer, chats: WAWebJS.Chat[]) {
     id: "selectComponent",
     width: "30%",
     height: "100%",
+    paddingRight: 5,
+    paddingTop: 1,
+    itemSpacing: 1,
     options: chats.map((chat) => ({
       name: chat.name || chat.id.user || "Unknown",
       description: chat.lastMessage?.body || "No messages yet",
@@ -49,21 +50,23 @@ async function renderConvoList(
   }
 
   const messages = await chat.fetchMessages({ limit: 100 });
-  const chatContent = messages
-    .map((msg) => `${msg.from}: ${msg.body}`)
+  let chatContact = chat.name;
+  let chatContent = messages
+    .map(
+      (msg) =>
+        `${msg.fromMe ? "Me" : (chat.isGroup ? msg.author : chatContact) || msg.from}: \n${msg.hasMedia ? "Image here.." : msg.body}\n`,
+    )
     .join("\n");
 
-  const scrollComponent = new ScrollBoxRenderable(
-    renderer,
-    {
-      id: "scrollComponent",
-      width: "70%",
-      height: "100%",
-      stickyScroll: true,
-      stickyStart: "bottom",
-    },
-    // Text({ content: chatContent || "No messages in this chat" }),
-  );
+  const scrollComponent = new ScrollBoxRenderable(renderer, {
+    id: "scrollComponent",
+    width: "70%",
+    height: "100%",
+    stickyScroll: true,
+    stickyStart: "bottom",
+    paddingLeft: 5,
+    paddingBottom: 1,
+  });
   scrollComponent.add(
     new TextRenderable(renderer, {
       id: "convoChats",
