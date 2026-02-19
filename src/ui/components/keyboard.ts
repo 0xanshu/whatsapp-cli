@@ -1,9 +1,7 @@
 import type { CliRenderer, KeyEvent } from "@opentui/core";
 import wsp from "../../client/whatsapp.ts";
 
-type KeyboardContext = {
-  // Context is kept for future keyboard shortcuts if needed
-};
+type KeyboardContext = {};
 
 function setupKeyboardInput(renderer: CliRenderer, ctx: KeyboardContext) {
   const keyHandler = renderer.keyInput;
@@ -11,6 +9,10 @@ function setupKeyboardInput(renderer: CliRenderer, ctx: KeyboardContext) {
     if (key.ctrl && key.name === "c") {
       await wsp.destroy();
       process.exit(0);
+    }
+
+    if (key.ctrl && key.name === "z") {
+      renderer.console.toggle();
     }
   });
 }

@@ -1,8 +1,16 @@
-import { Select, ScrollBox, Text } from "@opentui/core";
+import {
+  ScrollBox,
+  Text,
+  SelectRenderable,
+  CliRenderer,
+  ScrollBoxRenderable,
+  TextRenderable,
+} from "@opentui/core";
 import type WAWebJS from "whatsapp-web.js";
 
-function renderChatList(chats: WAWebJS.Chat[]) {
-  const selectComponent = Select({
+function renderChatList(renderer: CliRenderer, chats: WAWebJS.Chat[]) {
+  const selectComponent = new SelectRenderable(renderer, {
+    id: "selectComponent",
     width: "30%",
     height: "100%",
     options: chats.map((chat) => ({
@@ -10,18 +18,11 @@ function renderChatList(chats: WAWebJS.Chat[]) {
       description: chat.lastMessage?.body || "No messages yet",
     })),
   });
-
-  console.log("selectComponent type:", typeof selectComponent);
-  console.log("selectComponent keys:", Object.keys(selectComponent));
-  console.log(
-    "selectComponent.selectedIndex:",
-    (selectComponent as any).selectedIndex,
-  );
-
   return selectComponent;
 }
 
 async function renderConvoList(
+  renderer: CliRenderer,
   chats: Awaited<ReturnType<WAWebJS.Client["getChats"]>>,
   chatIndex: number,
 ) {
@@ -33,12 +34,16 @@ async function renderConvoList(
 
   if (!chat) {
     const isLoading = Array.isArray(chats) && chats.length === 0;
-    const scrollComponent = ScrollBox(
-      {
-        width: "70%",
-        height: "100%",
-      },
-      Text({ content: isLoading ? "Loading chats..." : "Chat not found" }),
+    const scrollComponent = new ScrollBoxRenderable(renderer, {
+      id: "scrollComponent",
+      width: "70%",
+      height: "100%",
+    });
+    scrollComponent.add(
+      new TextRenderable(renderer, {
+        id: "convoChats",
+        content: "Hello MF",
+      }),
     );
     return scrollComponent;
   }
@@ -48,12 +53,22 @@ async function renderConvoList(
     .map((msg) => `${msg.from}: ${msg.body}`)
     .join("\n");
 
-  const scrollComponent = ScrollBox(
+  const scrollComponent = new ScrollBoxRenderable(
+    renderer,
     {
+      id: "scrollComponent",
       width: "70%",
       height: "100%",
+      stickyScroll: true,
+      stickyStart: "bottom",
     },
-    Text({ content: chatContent || "No messages in this chat" }),
+    // Text({ content: chatContent || "No messages in this chat" }),
+  );
+  scrollComponent.add(
+    new TextRenderable(renderer, {
+      id: "convoChats",
+      content: chatContent || "No messages in here..",
+    }),
   );
   return scrollComponent;
 }

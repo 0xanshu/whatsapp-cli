@@ -1,4 +1,4 @@
-import { createCliRenderer, Box, Text } from "@opentui/core";
+import { createCliRenderer } from "@opentui/core";
 
 async function createOpenTuiApp() {
   try {
