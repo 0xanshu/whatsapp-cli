@@ -1,7 +1,15 @@
-import type { CliRenderer, KeyEvent } from "@opentui/core";
+import type {
+  CliRenderer,
+  InputRenderable,
+  KeyEvent,
+  SelectRenderable,
+} from "@opentui/core";
 import wsp from "../../client/whatsapp.ts";
 
-type KeyboardContext = {};
+type KeyboardContext = {
+  inputField: InputRenderable;
+  chatListComponent: SelectRenderable;
+};
 
 function setupKeyboardInput(renderer: CliRenderer, ctx: KeyboardContext) {
   const keyHandler = renderer.keyInput;
@@ -13,6 +21,16 @@ function setupKeyboardInput(renderer: CliRenderer, ctx: KeyboardContext) {
 
     if (key.ctrl && key.name === "z") {
       renderer.console.toggle();
+    }
+
+    if (key.ctrl && key.name === "s") {
+      ctx.inputField.focus();
+      console.log("the focus is on input field now..");
+    }
+
+    if (key.ctrl && key.name === "d") {
+      ctx.chatListComponent.focus();
+      console.log("the focus is on chat list now..");
     }
   });
 }

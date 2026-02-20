@@ -68,10 +68,6 @@ client.on("ready", () => {
   console.log(">>> [CLIENT] WhatsApp client is ready!");
 });
 
-client.on("loading_screen", (percent, message) => {
-  console.log(`>>> [CLIENT] Loading: ${percent}% - ${message}`);
-});
-
 client.on("disconnected", (reason) => {
   console.log(">>> Client disconnected:", reason);
 });
@@ -79,7 +75,5 @@ client.on("disconnected", (reason) => {
 client.on("auth_failure", (message) => {
   console.error(">>> Authentication failure:", message);
 });
-
-// client.on("message", (message) => {});
 
 export default client;

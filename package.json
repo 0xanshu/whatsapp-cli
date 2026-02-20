@@ -4,9 +4,11 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun src/index.ts"
+    "dev": "bun src/index.ts",
+    "lint": "biome lint ./src"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.4.3",
     "@types/bun": "latest",
     "@types/node": "^25.0.9",
     "@types/prompts": "^2.4.9",

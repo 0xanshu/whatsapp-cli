@@ -8,19 +8,21 @@ async function listChats(wsp: WAWebJS.Client): Promise<WAWebJS.Chat[] | null> {
 
   try {
     while (retries > 0) {
-      console.log(`Fetching chats... (attempt ${MAX_RETRIES - retries + 1}/${MAX_RETRIES})`);
+      console.log(
+        `Fetching chats... (attempt ${MAX_RETRIES - retries + 1}/${MAX_RETRIES})`,
+      );
       const chatsData = await wsp.getChats();
-      
+
       if (chatsData && chatsData.length > 0) {
         return chatsData;
       }
-      
+
       retries--;
       if (retries > 0) {
         await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
       }
     }
-    
+
     console.error(">>> Failed to fetch chats after maximum retries");
     return null;
   } catch (error) {
@@ -29,4 +31,8 @@ async function listChats(wsp: WAWebJS.Client): Promise<WAWebJS.Chat[] | null> {
   }
 }
 
-export { listChats };
+async function sendMessages(chat: WAWebJS.Chat[], idx: number, value: string) {
+  chat[idx]?.sendMessage(value);
+}
+
+export { listChats, sendMessages };

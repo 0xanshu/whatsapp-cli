@@ -1,18 +1,32 @@
-import { renderChatList, renderConvoList } from "./chatList.ts";
+import { renderChatList, renderConvoList, convoInput } from "./chatList.ts";
 import {
   BoxRenderable,
-  CliRenderer,
+  type CliRenderer,
+  type SelectRenderable,
   SelectRenderableEvents,
-  type SelectOption,
+  InputRenderableEvents,
 } from "@opentui/core";
 import type WAWebJS from "whatsapp-web.js";
 import { setupKeyboardInput } from "./keyboard.ts";
+import { sendMessages } from "../../chat.ts";
 
-async function renderWhatsAppUI(renderer: CliRenderer, chats: WAWebJS.Chat[]) {
+async function renderWhatsAppUI(
+  wsp: WAWebJS.Client,
+  renderer: CliRenderer,
+  chats: WAWebJS.Chat[],
+) {
+  // making the whole window
   const container = new BoxRenderable(renderer, {
     width: "100%",
     height: "100%",
     flexDirection: "row",
+  });
+
+  // making the converstaion window
+  const convoContainer = new BoxRenderable(renderer, {
+    width: "70%",
+    height: "100%",
+    flexDirection: "column",
   });
 
   const chatListComponent = renderChatList(renderer, chats);
@@ -21,7 +35,7 @@ async function renderWhatsAppUI(renderer: CliRenderer, chats: WAWebJS.Chat[]) {
 
   let initialIndex = 0;
   try {
-    const si = (chatListComponent as any).selectedIndex;
+    const si = (chatListComponent as SelectRenderable).selectedIndex;
     if (typeof si === "number") initialIndex = si;
   } catch {
     initialIndex = 0;
@@ -38,26 +52,76 @@ async function renderWhatsAppUI(renderer: CliRenderer, chats: WAWebJS.Chat[]) {
     chats,
     initialIndex,
   );
-  container.add(currentConvoComponent);
-  renderer.root.add(container);
+  convoContainer.add(currentConvoComponent);
 
+  let currentIdx = initialIndex;
+  const inputField = await convoInput(renderer);
+
+  // re-rendering the whole convo component
+  wsp.on("message_create", async (message) => {
+    const currentChatId = chats[currentIdx]?.id._serialized;
+
+    const isRelevant = message.fromMe
+      ? message.to === currentChatId
+      : message.from === currentChatId;
+
+    if (isRelevant) {
+      convoContainer.remove("scrollComponent");
+      convoContainer.remove("inputField");
+
+      currentConvoComponent = await renderConvoList(
+        renderer,
+        chats,
+        currentIdx,
+      );
+
+      convoContainer.add(currentConvoComponent);
+      convoContainer.add(inputField);
+    }
+  });
+
+  // input activates when pressed enter, triggers an activity to send the message
+  inputField.on(InputRenderableEvents.ENTER, async (value) => {
+    console.log("Input value:", value, "idx value:", currentIdx);
+
+    // awaiting till the message is sent
+    await sendMessages(chats, currentIdx, value);
+
+    // clearing the input field after return is pressed
+    inputField.value = "";
+  });
+
+  // changing the chat that is selected
   chatListComponent.on(
     SelectRenderableEvents.ITEM_SELECTED,
-    async (index: number, option: SelectOption) => {
+    async (index: number) => {
       console.log(">>> SELECT EVENT FIRED with index:", index);
 
       // removes the existing convo window
-      container.remove("scrollComponent");
-      const idx =
+      convoContainer.remove("scrollComponent");
+      convoContainer.remove("inputField");
+
+      currentIdx =
         typeof index === "number"
           ? Math.max(0, Math.min(index, chats.length - 1))
           : 0;
-      currentConvoComponent = await renderConvoList(renderer, chats, idx);
-      container.add(currentConvoComponent);
+
+      currentConvoComponent = await renderConvoList(
+        renderer,
+        chats,
+        currentIdx,
+      );
+
+      // adds the convo component and the input again in order so that input is added down only
+      convoContainer.add(currentConvoComponent);
+      convoContainer.add(inputField);
     },
   );
 
-  setupKeyboardInput(renderer, {});
+  container.add(convoContainer);
+  renderer.root.add(container);
+
+  setupKeyboardInput(renderer, { inputField, chatListComponent });
 }
 
 export { renderWhatsAppUI };

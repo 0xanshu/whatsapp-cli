@@ -1,8 +1,9 @@
 import {
   SelectRenderable,
-  CliRenderer,
+  type CliRenderer,
   ScrollBoxRenderable,
   TextRenderable,
+  InputRenderable,
 } from "@opentui/core";
 import type WAWebJS from "whatsapp-web.js";
 
@@ -12,7 +13,7 @@ function renderChatList(renderer: CliRenderer, chats: WAWebJS.Chat[]) {
     width: "30%",
     height: "100%",
     paddingRight: 5,
-    paddingTop: 1,
+    paddingTop: 5,
     itemSpacing: 1,
     options: chats.map((chat) => ({
       name: chat.name || chat.id.user || "Unknown",
@@ -34,11 +35,10 @@ async function renderConvoList(
   const chat = chats[idx];
 
   if (!chat) {
-    const isLoading = Array.isArray(chats) && chats.length === 0;
     const scrollComponent = new ScrollBoxRenderable(renderer, {
       id: "scrollComponent",
       width: "70%",
-      height: "100%",
+      height: "95%",
     });
     scrollComponent.add(
       new TextRenderable(renderer, {
@@ -50,8 +50,8 @@ async function renderConvoList(
   }
 
   const messages = await chat.fetchMessages({ limit: 100 });
-  let chatContact = chat.name;
-  let chatContent = messages
+  const chatContact = chat.name;
+  const chatContent = messages
     .map(
       (msg) =>
         `${msg.fromMe ? "Me" : (chat.isGroup ? msg.author : chatContact) || msg.from}: \n${msg.hasMedia ? "Image here.." : msg.body}\n`,
@@ -60,20 +60,34 @@ async function renderConvoList(
 
   const scrollComponent = new ScrollBoxRenderable(renderer, {
     id: "scrollComponent",
-    width: "70%",
-    height: "100%",
+    width: "100%",
+    height: "auto",
     stickyScroll: true,
     stickyStart: "bottom",
     paddingLeft: 5,
     paddingBottom: 1,
   });
+
   scrollComponent.add(
     new TextRenderable(renderer, {
       id: "convoChats",
       content: chatContent || "No messages in here..",
     }),
   );
+
   return scrollComponent;
 }
 
-export { renderChatList, renderConvoList };
+async function convoInput(renderer: CliRenderer) {
+  const input = new InputRenderable(renderer, {
+    id: "convoInput",
+    width: "100%",
+    marginLeft: 5,
+    marginBottom: 2,
+    placeholder: "Enter your message..",
+  });
+
+  return input;
+}
+
+export { renderChatList, renderConvoList, convoInput };

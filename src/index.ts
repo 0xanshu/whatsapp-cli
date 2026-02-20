@@ -31,7 +31,7 @@ wsp.on("ready", async () => {
       }
     });
 
-    await renderWhatsAppUI(renderer, chats);
+    await renderWhatsAppUI(wsp, renderer, chats);
     renderer.start();
   } catch (error) {
     console.error(">>> Error during setup:", error);
