@@ -31,8 +31,16 @@ async function listChats(wsp: WAWebJS.Client): Promise<WAWebJS.Chat[] | null> {
   }
 }
 
-async function sendMessages(chat: WAWebJS.Chat[], idx: number, value: string) {
-  chat[idx]?.sendMessage(value);
+async function sendMessages(
+  chats: WAWebJS.Chat[],
+  idx: number,
+  value: string,
+): Promise<void> {
+  const chat = chats[idx];
+  if (!chat) {
+    throw new Error(`Chat at index ${idx} not found`);
+  }
+  await chat.sendMessage(value);
 }
 
 export { listChats, sendMessages };

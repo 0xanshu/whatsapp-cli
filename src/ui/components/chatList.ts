@@ -7,7 +7,10 @@ import {
 } from "@opentui/core";
 import type WAWebJS from "whatsapp-web.js";
 
-function renderChatList(renderer: CliRenderer, chats: WAWebJS.Chat[]) {
+function renderChatList(
+  renderer: CliRenderer,
+  chats: Awaited<ReturnType<WAWebJS.Client["getChats"]>>,
+) {
   const selectComponent = new SelectRenderable(renderer, {
     id: "selectComponent",
     width: "30%",

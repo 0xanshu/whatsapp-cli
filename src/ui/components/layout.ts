@@ -22,7 +22,7 @@ async function renderWhatsAppUI(
     flexDirection: "row",
   });
 
-  // making the converstaion window
+  // making the conversation window
   const convoContainer = new BoxRenderable(renderer, {
     width: "70%",
     height: "100%",
