@@ -46,13 +46,16 @@ async function renderConvoList(
     scrollComponent.add(
       new TextRenderable(renderer, {
         id: "convoChats",
-        content: "Hello MF",
+        content: "Hello there!",
       }),
     );
     return scrollComponent;
   }
 
   const messages = await chat.fetchMessages({ limit: 100 });
+
+  // I will add each message to cache.get(chatID) after fetch
+  
   const chatContact = chat.name;
   const chatContent = messages
     .map(

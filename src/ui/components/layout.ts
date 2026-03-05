@@ -52,6 +52,7 @@ async function renderWhatsAppUI(
     chats,
     initialIndex,
   );
+  let cacheConvoComponent = currentConvoComponent;
   convoContainer.add(currentConvoComponent);
 
   let currentIdx = initialIndex;
@@ -86,6 +87,9 @@ async function renderWhatsAppUI(
 
     // awaiting till the message is sent
     await sendMessages(chats, currentIdx, value);
+
+    let currentMessageSent = value;
+    cache.getCurrentMessage(value);
 
     // clearing the input field after return is pressed
     inputField.value = "";
