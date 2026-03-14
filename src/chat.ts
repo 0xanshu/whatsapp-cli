@@ -1,4 +1,5 @@
 import type WAWebJS from "whatsapp-web.js";
+import { createCachedMessage, addMessageToCache } from "./utils/messageCache";
 
 const MAX_RETRIES = 20;
 const RETRY_DELAY_MS = 2000;
@@ -22,7 +23,6 @@ async function listChats(wsp: WAWebJS.Client): Promise<WAWebJS.Chat[] | null> {
         await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
       }
     }
-
     console.error(">>> Failed to fetch chats after maximum retries");
     return null;
   } catch (error) {
@@ -31,16 +31,10 @@ async function listChats(wsp: WAWebJS.Client): Promise<WAWebJS.Chat[] | null> {
   }
 }
 
-async function sendMessages(
-  chats: WAWebJS.Chat[],
-  idx: number,
-  value: string,
-): Promise<void> {
-  const chat = chats[idx];
-  if (!chat) {
-    throw new Error(`Chat at index ${idx} not found`);
-  }
-  await chat.sendMessage(value);
+async function sendMessages(chat: WAWebJS.Chat, value: string): Promise<void> {
+  const sentMessage = await chat.sendMessage(value);
+  createCachedMessage(sentMessage);
+  addMessageToCache(chat.id._serialized);
 }
 
 export { listChats, sendMessages };

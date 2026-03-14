@@ -6,6 +6,7 @@ import {
   InputRenderable,
 } from "@opentui/core";
 import type WAWebJS from "whatsapp-web.js";
+import { getChatMessages } from "../../utils/messageCache";
 
 function renderChatList(
   renderer: CliRenderer,
@@ -31,6 +32,8 @@ async function renderConvoList(
   chats: Awaited<ReturnType<WAWebJS.Client["getChats"]>>,
   chatIndex: number,
 ) {
+  let messages: WAWebJS.Message[] = [];
+
   const idx =
     typeof chatIndex === "number"
       ? Math.max(0, Math.min(chatIndex, (chats?.length ?? 0) - 1))
@@ -43,19 +46,18 @@ async function renderConvoList(
       width: "70%",
       height: "95%",
     });
-    scrollComponent.add(
-      new TextRenderable(renderer, {
-        id: "convoChats",
-        content: "Hello there!",
-      }),
-    );
-    return scrollComponent;
+
+    const convoListContent = new TextRenderable(renderer, {
+      id: "convoChats",
+      content: "Hello there!",
+    });
+
+    scrollComponent.add(convoListContent);
+    messages = [];
+    return { scrollComponent, convoListContent, messages };
   }
 
-  const messages = await chat.fetchMessages({ limit: 100 });
-
-  // I will add each message to cache.get(chatID) after fetch
-  
+  messages = await chat.fetchMessages({ limit: 100 });
   const chatContact = chat.name;
   const chatContent = messages
     .map(
@@ -74,14 +76,31 @@ async function renderConvoList(
     paddingBottom: 1,
   });
 
-  scrollComponent.add(
-    new TextRenderable(renderer, {
-      id: "convoChats",
-      content: chatContent || "No messages in here..",
-    }),
-  );
+  const convoListContent = new TextRenderable(renderer, {
+    id: "convoChats",
+    content: chatContent || "No messages in here..",
+  });
+  scrollComponent.add(convoListContent);
 
-  return scrollComponent;
+  return { scrollComponent, convoListContent, messages };
+}
+
+async function updateConvoList(
+  textComponent: TextRenderable,
+  chat: WAWebJS.Chat,
+  isGroup: boolean,
+  chatID: string,
+): Promise<void> {
+  const cachedMessages = getChatMessages(chatID);
+
+  const formattedText = cachedMessages
+    .map(
+      (msg) =>
+        `${msg.fromMe ? "Me" : (chat.isGroup ? msg.author : chat.name) || msg.from}: \n${msg.hasMedia ? "Image here.." : msg.body}\n`,
+    )
+    .join("\n");
+
+  textComponent.content = formattedText;
 }
 
 async function convoInput(renderer: CliRenderer) {
@@ -96,4 +115,4 @@ async function convoInput(renderer: CliRenderer) {
   return input;
 }
 
-export { renderChatList, renderConvoList, convoInput };
+export { renderChatList, renderConvoList, updateConvoList, convoInput };

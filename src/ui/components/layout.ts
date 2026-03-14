@@ -1,4 +1,9 @@
-import { renderChatList, renderConvoList, convoInput } from "./chatList.ts";
+import {
+  renderChatList,
+  renderConvoList,
+  convoInput,
+  updateConvoList,
+} from "./chatList.ts";
 import {
   BoxRenderable,
   type CliRenderer,
@@ -9,6 +14,7 @@ import {
 import type WAWebJS from "whatsapp-web.js";
 import { setupKeyboardInput } from "./keyboard.ts";
 import { sendMessages } from "../../chat.ts";
+import { initializeChat } from "../../utils/messageCache.ts";
 
 async function renderWhatsAppUI(
   wsp: WAWebJS.Client,
@@ -52,8 +58,8 @@ async function renderWhatsAppUI(
     chats,
     initialIndex,
   );
-  let cacheConvoComponent = currentConvoComponent;
-  convoContainer.add(currentConvoComponent);
+
+  convoContainer.add(currentConvoComponent.scrollComponent);
 
   let currentIdx = initialIndex;
   const inputField = await convoInput(renderer);
@@ -69,14 +75,12 @@ async function renderWhatsAppUI(
     if (isRelevant) {
       convoContainer.remove("scrollComponent");
       convoContainer.remove("inputField");
-
       currentConvoComponent = await renderConvoList(
         renderer,
         chats,
         currentIdx,
       );
-
-      convoContainer.add(currentConvoComponent);
+      convoContainer.add(currentConvoComponent.scrollComponent);
       convoContainer.add(inputField);
     }
   });
@@ -84,14 +88,17 @@ async function renderWhatsAppUI(
   // input activates when pressed enter, triggers an activity to send the message
   inputField.on(InputRenderableEvents.ENTER, async (value) => {
     console.log("Input value:", value, "idx value:", currentIdx);
-
-    // awaiting till the message is sent
-    await sendMessages(chats, currentIdx, value);
-
-    let currentMessageSent = value;
-    cache.getCurrentMessage(value);
-
-    // clearing the input field after return is pressed
+    const chat = chats[currentIdx];
+    if (!chat) {
+      throw new Error(`Chat at index ${currentIdx} not found`);
+    }
+    await sendMessages(chat, value);
+    updateConvoList(
+      currentConvoComponent.convoListContent,
+      chat,
+      chat.isGroup,
+      chat.id._serialized,
+    );
     inputField.value = "";
   });
 
@@ -101,7 +108,6 @@ async function renderWhatsAppUI(
     async (index: number) => {
       console.log(">>> SELECT EVENT FIRED with index:", index);
 
-      // removes the existing convo window
       convoContainer.remove("scrollComponent");
       convoContainer.remove("inputField");
 
@@ -110,14 +116,21 @@ async function renderWhatsAppUI(
           ? Math.max(0, Math.min(index, chats.length - 1))
           : 0;
 
+      const chat = chats[currentIdx];
+      if (!chat) {
+        console.log(">>> SELECTED CHAT IS NOT DEFINED");
+        return;
+      }
+
       currentConvoComponent = await renderConvoList(
         renderer,
         chats,
         currentIdx,
       );
+      initializeChat(chat.id._serialized, currentConvoComponent.messages);
 
       // adds the convo component and the input again in order so that input is added down only
-      convoContainer.add(currentConvoComponent);
+      convoContainer.add(currentConvoComponent.scrollComponent);
       convoContainer.add(inputField);
     },
   );
