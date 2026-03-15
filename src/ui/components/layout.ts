@@ -99,6 +99,7 @@ async function renderWhatsAppUI(
       chat.isGroup,
       chat.id._serialized,
     );
+    await initializeChat(chat.id._serialized, currentConvoComponent.messages);
     inputField.value = "";
   });
 
@@ -127,7 +128,7 @@ async function renderWhatsAppUI(
         chats,
         currentIdx,
       );
-      initializeChat(chat.id._serialized, currentConvoComponent.messages);
+      await initializeChat(chat.id._serialized, currentConvoComponent.messages);
 
       // adds the convo component and the input again in order so that input is added down only
       convoContainer.add(currentConvoComponent.scrollComponent);

@@ -91,7 +91,7 @@ async function updateConvoList(
   isGroup: boolean,
   chatID: string,
 ): Promise<void> {
-  const cachedMessages = getChatMessages(chatID);
+  const cachedMessages = await getChatMessages(chatID);
 
   const formattedText = cachedMessages
     .map(

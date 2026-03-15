@@ -33,8 +33,8 @@ async function listChats(wsp: WAWebJS.Client): Promise<WAWebJS.Chat[] | null> {
 
 async function sendMessages(chat: WAWebJS.Chat, value: string): Promise<void> {
   const sentMessage = await chat.sendMessage(value);
-  createCachedMessage(sentMessage);
-  addMessageToCache(chat.id._serialized);
+  await createCachedMessage(sentMessage);
+  await addMessageToCache(chat.id._serialized);
 }
 
 export { listChats, sendMessages };
