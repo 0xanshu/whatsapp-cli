@@ -92,6 +92,7 @@ async function renderWhatsAppUI(
     if (!chat) {
       throw new Error(`Chat at index ${currentIdx} not found`);
     }
+    await initializeChat(chat.id._serialized, currentConvoComponent.messages);
     await sendMessages(chat, value);
     updateConvoList(
       currentConvoComponent.convoListContent,
@@ -99,7 +100,6 @@ async function renderWhatsAppUI(
       chat.isGroup,
       chat.id._serialized,
     );
-    await initializeChat(chat.id._serialized, currentConvoComponent.messages);
     inputField.value = "";
   });
 

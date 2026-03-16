@@ -32,6 +32,16 @@ function setupKeyboardInput(renderer: CliRenderer, ctx: KeyboardContext) {
       ctx.chatListComponent.focus();
       console.log("the focus is on chat list now..");
     }
+
+    if (key.name === "right") {
+      ctx.inputField.focus();
+      console.log("the focus is on input field now..");
+    }
+
+    if (key.name === "left") {
+      ctx.chatListComponent.focus();
+      console.log("the focus is on chat list now..");
+    }
   });
 }
 
