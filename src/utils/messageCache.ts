@@ -11,6 +11,7 @@ async function addMessageToCache(message: WAWebJS.Message, chatID: string) {
   allMessages = messageCache.get(chatID);
   if (allMessages) {
     allMessages.push(message);
+    messageCache.set(chatID, allMessages);
   } else {
     messageCache.set(chatID, [message]);
   }

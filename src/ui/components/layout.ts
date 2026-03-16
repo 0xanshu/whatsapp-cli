@@ -14,7 +14,7 @@ import {
 import type WAWebJS from "whatsapp-web.js";
 import { setupKeyboardInput } from "./keyboard.ts";
 import { sendMessages } from "../../chat.ts";
-import { initializeChat } from "../../utils/messageCache.ts";
+import { initializeChat, addMessageToCache } from "../../utils/messageCache.ts";
 
 async function renderWhatsAppUI(
   wsp: WAWebJS.Client,
@@ -66,22 +66,27 @@ async function renderWhatsAppUI(
 
   // re-rendering the whole convo component
   wsp.on("message_create", async (message) => {
-    const currentChatId = chats[currentIdx]?.id._serialized;
+    // Add incoming message to the cache first so it's fresh
+    const chatMessageId = message.fromMe ? message.to : message.from;
 
-    const isRelevant = message.fromMe
-      ? message.to === currentChatId
-      : message.from === currentChatId;
+    // Skip caching our own messages here since `sendMessages` already cached it on ENTER
+    if (!message.fromMe) {
+      await addMessageToCache(message, chatMessageId);
+    }
+
+    const currentChatId = chats[currentIdx]?.id._serialized;
+    const isRelevant = chatMessageId === currentChatId;
 
     if (isRelevant) {
-      convoContainer.remove("scrollComponent");
-      convoContainer.remove("inputField");
-      currentConvoComponent = await renderConvoList(
-        renderer,
-        chats,
-        currentIdx,
-      );
-      convoContainer.add(currentConvoComponent.scrollComponent);
-      convoContainer.add(inputField);
+      const chat = chats[currentIdx];
+      if (chat) {
+        await updateConvoList(
+          currentConvoComponent.convoListContent,
+          chat,
+          chat.isGroup,
+          currentChatId,
+        );
+      }
     }
   });
 
@@ -92,15 +97,16 @@ async function renderWhatsAppUI(
     if (!chat) {
       throw new Error(`Chat at index ${currentIdx} not found`);
     }
-    await initializeChat(chat.id._serialized, currentConvoComponent.messages);
-    await sendMessages(chat, value);
-    updateConvoList(
-      currentConvoComponent.convoListContent,
-      chat,
-      chat.isGroup,
-      chat.id._serialized,
-    );
-    inputField.value = "";
+    if (value != "") {
+      await sendMessages(chat, value);
+      await updateConvoList(
+        currentConvoComponent.convoListContent,
+        chat,
+        chat.isGroup,
+        chat.id._serialized,
+      );
+      inputField.value = "";
+    }
   });
 
   // changing the chat that is selected
