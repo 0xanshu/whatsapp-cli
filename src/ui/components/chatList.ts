@@ -88,7 +88,6 @@ async function renderConvoList(
 async function updateConvoList(
   textComponent: TextRenderable,
   chat: WAWebJS.Chat,
-  isGroup: boolean,
   chatID: string,
 ): Promise<void> {
   const cachedMessages = await getChatMessages(chatID);

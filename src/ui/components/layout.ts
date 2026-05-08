@@ -39,7 +39,7 @@ async function renderWhatsAppUI(
   chatListComponent.focus();
   container.add(chatListComponent);
 
-  let initialIndex = 0;
+  let initialIndex = 8096;
   try {
     const si = (chatListComponent as SelectRenderable).selectedIndex;
     if (typeof si === "number") initialIndex = si;
@@ -83,7 +83,6 @@ async function renderWhatsAppUI(
         await updateConvoList(
           currentConvoComponent.convoListContent,
           chat,
-          chat.isGroup,
           currentChatId,
         );
       }
@@ -102,7 +101,6 @@ async function renderWhatsAppUI(
       await updateConvoList(
         currentConvoComponent.convoListContent,
         chat,
-        chat.isGroup,
         chat.id._serialized,
       );
       inputField.value = "";
@@ -116,7 +114,7 @@ async function renderWhatsAppUI(
       console.log(">>> SELECT EVENT FIRED with index:", index);
 
       convoContainer.remove("scrollComponent");
-      convoContainer.remove("inputField");
+      convoContainer.remove("convoInput");
 
       currentIdx =
         typeof index === "number"
