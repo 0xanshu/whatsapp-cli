@@ -19,7 +19,7 @@ try {
     },
   });
 } catch (error) {
-  console.error(">>> Error initializing WhatsApp client:", error);
+  console.error(">>> [whatsapp.ts] Error initializing WhatsApp client:", error);
   throw error;
 }
 
@@ -56,7 +56,7 @@ if (process.stdout.columns && process.stdout.columns < MIN_WIDTH) {
 }
 
 client.on("qr", (qrCode) => {
-  console.log(">>> QR Code received, please scan...");
+  console.log(">>> [CLIENT] QR Code received, please scan...");
   qr.generate(qrCode, { small: true });
 });
 
@@ -69,11 +69,11 @@ client.on("ready", () => {
 });
 
 client.on("disconnected", (reason) => {
-  console.log(">>> Client disconnected:", reason);
+  console.log(">>> [CLIENT] Client disconnected:", reason);
 });
 
 client.on("auth_failure", (message) => {
-  console.error(">>> Authentication failure:", message);
+  console.error(">>> [CLIENT] Authentication failure:", message);
 });
 
 export default client;

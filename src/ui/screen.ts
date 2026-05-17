@@ -10,7 +10,7 @@ async function createOpenTuiApp() {
 
     return renderer;
   } catch (error) {
-    console.error(">>> Error creating OpenTuiApp:", error);
+    console.error(">>> [OPENTUI] Error creating OpenTuiApp:", error);
     throw error;
   }
 }
