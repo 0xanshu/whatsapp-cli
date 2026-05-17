@@ -19,10 +19,6 @@ function setupKeyboardInput(renderer: CliRenderer, ctx: KeyboardContext) {
       process.exit(0);
     }
 
-    if (key.ctrl && key.name === "z") {
-      renderer.console.toggle();
-    }
-
     if (key.ctrl && key.name === "s") {
       ctx.inputField.focus();
       console.log("the focus is on input field now..");

@@ -23,7 +23,6 @@ async function listChats(wsp: WAWebJS.Client): Promise<WAWebJS.Chat[] | null> {
       const chatsData = await Promise.race([chatsPromise, timeoutPromise]);
 
       if (Array.isArray(chatsData) && chatsData.length > 0) {
-        console.log(">>> [chat.ts] returning chats data");
         return chatsData;
       }
     } catch (error) {

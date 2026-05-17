@@ -1,6 +1,8 @@
-# whatsapp-cli
+# Whatsapp-CLI
 
-A command-line interface for WhatsApp built with TypeScript and [Bun](https://bun.com). Send and manage WhatsApp messages programmatically with an intuitive terminal UI.
+A powerful, TypeScript-based CLI that brings the full WhatsApp experience to your terminal, powered by [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js).
+
+![CLI Demo](CLI_Demo.jpeg)
 
 ## Prerequisites
 
@@ -13,71 +15,22 @@ A command-line interface for WhatsApp built with TypeScript and [Bun](https://bu
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/yourusername/whatsapp-cli.git
+git clone https://github.com/0xanshu/whatsapp-cli.git
 cd whatsapp-cli
 bun install
 bun run dev
 ```
 
-The application will open an interactive TUI where you can:
+## Keyboard Shortcuts
 
-- View your chat list
-- Send messages
-- Receive real-time message updates
+| Shortcut                 | Action               |
+| ------------------------ | -------------------- |
+| `Ctrl+C`                 | Exit the application |
+| `Ctrl+S` / `Right Arrow` | Focus on input field |
+| `Ctrl+D` / `Left Arrow`  | Focus on chat list   |
+| `Ctrl+L` / `Ctrl+` `     | Toggle console       |
 
-## Project Structure
-
-```
-src/
-├── index.ts              # Application entry point
-├── chat.ts               # Chat management logic
-├── client/
-│   └── whatsapp.ts       # WhatsApp Web client wrapper
-├── types/                # TypeScript type definitions
-├── ui/
-│   ├── screen.ts         # Main UI screen manager
-│   └── components/
-│       ├── chatList.ts    # Chat list component
-│       ├── keyboard.ts    # Keyboard input handler
-│       └── layout.ts      # UI layout manager
-└── utils/
-    └── messageCache.ts   # Message caching utilities
-```
-
-## Known Issues & Fixes
-
-### WhatsApp Message Send Error
-
-If you encounter the following error:
-
-```
-Failed to send message: Error [TypeError]: Cannot read properties of undefined (reading 'markedUnread')
-```
-
-**Solution:** Add the following code to line 16 of `node_modules/whatsapp-web.js/src/util/Util.js`:
-
-```javascript
-if (
-  window.compareWwebVersions(window.Debug.VERSION, "<=", "2.3000.1031980585")
-) {
-  await window.Store.SendSeen.sendSeen(chat);
-} else {
-  await window.Store.SendSeen.sendSeen({
-    chat: chat,
-    threadId: undefined,
-  });
-}
-```
-
-This ensures compatibility with newer versions of WhatsApp Web.
-
-## Configuration
-
-Configuration options can be set via environment variables or a `.env` file in the project root.
-
-## Development
-
-### Build
+## Build
 
 ```bash
 bun build src/index.ts --outfile dist/index.js
@@ -103,5 +56,4 @@ This project is unofficial and not affiliated with WhatsApp or Meta Platforms, I
 
 ## Acknowledgments
 
-- [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js) - WhatsApp Web client library
-- [Bun](https://bun.com) - JavaScript runtime
+[whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js) - WhatsApp Web client library
