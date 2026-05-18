@@ -15,6 +15,36 @@ try {
         "--no-first-run",
         "--no-zygote",
         "--disable-gpu",
+
+        // --- HIGH IMPACT ---
+        "--disable-extensions",
+        "--disable-software-rasterizer",
+        "--disable-features=site-per-process",
+        "--single-process",
+        "--disable-renderer-backgrounding",
+        "--disable-background-timer-throttling",
+        "--disable-backgrounding-occluded-windows",
+
+        // --- MEDIUM IMPACT ---
+        "--mute-audio",
+        "--hide-scrollbars",
+        "--disable-ipc-flooding-protection",
+        "--disable-default-apps",
+        "--disable-hang-monitor",
+        "--disable-prompt-on-repost",
+        "--disable-translate",
+        "--disable-component-update",
+        "--metrics-recording-only",
+        "--no-default-browser-check",
+
+        // --- LOW IMPACT ---
+        "--disable-domain-reliability",
+        "--disable-client-side-phishing-detection",
+        "--disable-sync",
+        "--disable-features=TranslateUI",
+
+        // --- MEMORY LIMIT ---
+        '--js-flags="--max-old-space-size=512"',
       ],
     },
   });

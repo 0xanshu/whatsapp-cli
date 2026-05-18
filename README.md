@@ -28,7 +28,7 @@ bun run dev
 | `Ctrl+C`                 | Exit the application |
 | `Ctrl+S` / `Right Arrow` | Focus on input field |
 | `Ctrl+D` / `Left Arrow`  | Focus on chat list   |
-| `Ctrl+L` / `Ctrl+` `     | Toggle console       |
+| `Ctrl+L` / `` ` ``       | Toggle console       |
 
 ## Build
 
