@@ -1,24 +1,31 @@
 import type WAWebJS from "whatsapp-web.js";
 
 let messageCache = new Map<string, WAWebJS.Message[]>();
-let allMessages: WAWebJS.Message[] | undefined;
+const MAX_CACHED_CHATS = 20;
+const MAX_MESSAGES_PER_CHAT = 200;
 
-async function initializeChat(chatID: string, message: WAWebJS.Message[]) {
-  messageCache.set(chatID, message);
+function initializeChat(chatID: string, messages: WAWebJS.Message[]) {
+  if (messageCache.size >= MAX_CACHED_CHATS && !messageCache.has(chatID)) {
+    const oldestKey = messageCache.keys().next().value;
+    if (oldestKey) messageCache.delete(oldestKey);
+  }
+  messageCache.set(chatID, messages.slice(-MAX_MESSAGES_PER_CHAT));
 }
 
-async function addMessageToCache(message: WAWebJS.Message, chatID: string) {
-  allMessages = messageCache.get(chatID);
-  if (allMessages) {
-    allMessages.push(message);
-    messageCache.set(chatID, allMessages);
+function addMessageToCache(message: WAWebJS.Message, chatID: string) {
+  const existing = messageCache.get(chatID);
+  if (existing) {
+    existing.push(message);
+    if (existing.length > MAX_MESSAGES_PER_CHAT) {
+      existing.splice(0, existing.length - MAX_MESSAGES_PER_CHAT);
+    }
   } else {
     messageCache.set(chatID, [message]);
   }
 }
 
-async function getChatMessages(chatID: string) {
-  return allMessages ?? [];
+function getChatMessages(chatID: string) {
+  return messageCache.get(chatID) ?? [];
 }
 
 export { initializeChat, addMessageToCache, getChatMessages };
