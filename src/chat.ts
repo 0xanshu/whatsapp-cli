@@ -4,7 +4,9 @@ import { addMessageToCache } from "./utils/messageCache";
 const MAX_RETRIES = 5;
 const TIMEOUT = 60000;
 
-async function listChats(wsp: WAWebJS.Client): Promise<WAWebJS.Chat[] | null> {
+export async function listChats(
+  wsp: WAWebJS.Client,
+): Promise<WAWebJS.Chat[] | null> {
   let retries = MAX_RETRIES;
 
   while (retries > 0) {
@@ -40,9 +42,10 @@ async function listChats(wsp: WAWebJS.Client): Promise<WAWebJS.Chat[] | null> {
   return null;
 }
 
-async function sendMessages(chat: WAWebJS.Chat, value: string): Promise<void> {
+export async function sendMessages(
+  chat: WAWebJS.Chat,
+  value: string,
+): Promise<void> {
   const sentMessage = await chat.sendMessage(value);
   await addMessageToCache(sentMessage, chat.id._serialized);
 }
-
-export { listChats, sendMessages };

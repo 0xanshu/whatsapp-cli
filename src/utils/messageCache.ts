@@ -4,7 +4,7 @@ let messageCache = new Map<string, WAWebJS.Message[]>();
 const MAX_CACHED_CHATS = 20;
 const MAX_MESSAGES_PER_CHAT = 200;
 
-function initializeChat(chatID: string, messages: WAWebJS.Message[]) {
+export function initializeChat(chatID: string, messages: WAWebJS.Message[]) {
   if (messageCache.size >= MAX_CACHED_CHATS && !messageCache.has(chatID)) {
     const oldestKey = messageCache.keys().next().value;
     if (oldestKey) messageCache.delete(oldestKey);
@@ -12,7 +12,7 @@ function initializeChat(chatID: string, messages: WAWebJS.Message[]) {
   messageCache.set(chatID, messages.slice(-MAX_MESSAGES_PER_CHAT));
 }
 
-function addMessageToCache(message: WAWebJS.Message, chatID: string) {
+export function addMessageToCache(message: WAWebJS.Message, chatID: string) {
   const existing = messageCache.get(chatID);
   if (existing) {
     existing.push(message);
@@ -24,8 +24,6 @@ function addMessageToCache(message: WAWebJS.Message, chatID: string) {
   }
 }
 
-function getChatMessages(chatID: string) {
+export function getChatMessages(chatID: string) {
   return messageCache.get(chatID) ?? [];
 }
-
-export { initializeChat, addMessageToCache, getChatMessages };

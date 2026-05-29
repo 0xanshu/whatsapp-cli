@@ -11,7 +11,10 @@ type KeyboardContext = {
   chatListComponent: SelectRenderable;
 };
 
-function setupKeyboardInput(renderer: CliRenderer, ctx: KeyboardContext) {
+export function setupKeyboardInput(
+  renderer: CliRenderer,
+  ctx: KeyboardContext,
+) {
   const keyHandler = renderer.keyInput;
   keyHandler.on("keypress", async (key: KeyEvent) => {
     if (key.ctrl && key.name === "c") {
@@ -40,5 +43,3 @@ function setupKeyboardInput(renderer: CliRenderer, ctx: KeyboardContext) {
     }
   });
 }
-
-export { setupKeyboardInput };

@@ -4,11 +4,25 @@ import {
   ScrollBoxRenderable,
   TextRenderable,
   InputRenderable,
+  BoxRenderable,
 } from "@opentui/core";
+import { Box, Text, createCliRenderer } from "@opentui/core";
 import type WAWebJS from "whatsapp-web.js";
 import { getChatMessages } from "../../utils/messageCache";
 
-function renderChatList(
+export async function convoInput(renderer: CliRenderer) {
+  const input = new InputRenderable(renderer, {
+    id: "convoInput",
+    width: "100%",
+    marginLeft: 5,
+    marginBottom: 2,
+    placeholder: "Enter your message..",
+  });
+
+  return input;
+}
+
+export function renderChatList(
   renderer: CliRenderer,
   chats: Awaited<ReturnType<WAWebJS.Client["getChats"]>>,
 ) {
@@ -27,7 +41,7 @@ function renderChatList(
   return selectComponent;
 }
 
-async function renderConvoList(
+export async function renderConvoList(
   renderer: CliRenderer,
   chats: Awaited<ReturnType<WAWebJS.Client["getChats"]>>,
   chatIndex: number,
@@ -85,7 +99,7 @@ async function renderConvoList(
   return { scrollComponent, convoListContent, messages };
 }
 
-async function updateConvoList(
+export async function updateConvoList(
   textComponent: TextRenderable,
   chat: WAWebJS.Chat,
   chatID: string,
@@ -101,17 +115,3 @@ async function updateConvoList(
 
   textComponent.content = formattedText;
 }
-
-async function convoInput(renderer: CliRenderer) {
-  const input = new InputRenderable(renderer, {
-    id: "convoInput",
-    width: "100%",
-    marginLeft: 5,
-    marginBottom: 2,
-    placeholder: "Enter your message..",
-  });
-
-  return input;
-}
-
-export { renderChatList, renderConvoList, updateConvoList, convoInput };

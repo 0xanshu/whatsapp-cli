@@ -86,24 +86,24 @@ if (process.stdout.columns && process.stdout.columns < MIN_WIDTH) {
 }
 
 client.on("qr", (qrCode) => {
-  console.log(">>> [CLIENT] QR Code received, please scan...");
+  console.log(">>> [whatsapp.ts] QR Code received, please scan...");
   qr.generate(qrCode, { small: true });
 });
 
 client.on("authenticated", () => {
-  console.log(">>> [CLIENT] Authentication successful!");
+  console.log(">>> [whatsapp.ts] Authentication successful!");
 });
 
 client.on("ready", () => {
-  console.log(">>> [CLIENT] WhatsApp client is ready!");
+  console.log(">>> [whatsapp.ts] WhatsApp client is ready!");
 });
 
 client.on("disconnected", (reason) => {
-  console.log(">>> [CLIENT] Client disconnected:", reason);
+  console.log(">>> [whatsapp.ts] Client disconnected:", reason);
 });
 
 client.on("auth_failure", (message) => {
-  console.error(">>> [CLIENT] Authentication failure:", message);
+  console.error(">>> [whatsapp.ts] Authentication failure:", message);
 });
 
 export default client;

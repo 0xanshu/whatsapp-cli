@@ -1,6 +1,6 @@
 import { createCliRenderer } from "@opentui/core";
 
-async function createOpenTuiApp() {
+export async function createOpenTuiApp() {
   try {
     const renderer = await createCliRenderer({
       useMouse: true,
@@ -14,5 +14,3 @@ async function createOpenTuiApp() {
     throw error;
   }
 }
-
-export { createOpenTuiApp };

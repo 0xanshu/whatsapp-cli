@@ -16,7 +16,7 @@ import { setupKeyboardInput } from "./keyboard.ts";
 import { sendMessages } from "../../chat.ts";
 import { initializeChat, addMessageToCache } from "../../utils/messageCache.ts";
 
-async function renderWhatsAppUI(
+export async function renderWhatsAppUI(
   wsp: WAWebJS.Client,
   renderer: CliRenderer,
   chats: WAWebJS.Chat[],
@@ -145,5 +145,3 @@ async function renderWhatsAppUI(
 
   setupKeyboardInput(renderer, { inputField, chatListComponent });
 }
-
-export { renderWhatsAppUI };
