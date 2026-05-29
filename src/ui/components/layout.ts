@@ -10,34 +10,115 @@ import {
   type SelectRenderable,
   SelectRenderableEvents,
   InputRenderableEvents,
+  TextRenderable,
+  InputRenderable,
 } from "@opentui/core";
 import type WAWebJS from "whatsapp-web.js";
 import { setupKeyboardInput } from "./keyboard.ts";
 import { sendMessages } from "../../chat.ts";
 import { initializeChat, addMessageToCache } from "../../utils/messageCache.ts";
 
-export async function renderWhatsAppUI(
-  wsp: WAWebJS.Client,
-  renderer: CliRenderer,
-  chats: WAWebJS.Chat[],
-) {
-  // making the whole window
+function buildLayout(renderer: CliRenderer, chats: WAWebJS.Chat[]) {
   const container = new BoxRenderable(renderer, {
     width: "100%",
     height: "100%",
     flexDirection: "row",
   });
 
-  // making the conversation window
   const convoContainer = new BoxRenderable(renderer, {
     width: "70%",
     height: "100%",
+    marginLeft: 1,
+    border: true,
+    borderColor: "gray",
+    borderStyle: "rounded",
+    title: "",
+    titleAlignment: "left",
     flexDirection: "column",
+  });
+
+  const chatListContainer = new BoxRenderable(renderer, {
+    width: "30%",
+    height: "100%",
+    border: true,
+    borderColor: "gray",
+    borderStyle: "rounded",
+    title: "Chat List",
+    titleAlignment: "left",
   });
 
   const chatListComponent = renderChatList(renderer, chats);
   chatListComponent.focus();
-  container.add(chatListComponent);
+  chatListContainer.add(chatListComponent);
+  container.add(chatListContainer);
+
+  return { container, chatListComponent, convoContainer };
+}
+
+function registerMessageEvents(
+  wsp: WAWebJS.Client,
+  chats: WAWebJS.Chat[],
+  chatIndex: number,
+  currentConvoComponent: { convoListContent: TextRenderable }
+) {
+  wsp.on("message_create", async (message) => {
+    const chatMessageId = message.fromMe ? message.to : message.from;
+
+    if (!message.fromMe) {
+      await addMessageToCache(message, chatMessageId);
+    }
+
+    const currentChatId = chats[chatIndex]?.id._serialized;
+    const isRelevant = chatMessageId === currentChatId;
+
+    if (isRelevant) {
+      const chat = chats[chatIndex];
+      if (chat) {
+        await updateConvoList(
+          currentConvoComponent.convoListContent,
+          chat,
+          currentChatId
+        );
+      }
+    }
+  });
+}
+
+function registerUIEvents(
+  inputField: InputRenderable,
+  chats: WAWebJS.Chat[],
+  currentIdx: number,
+  currentConvoComponent: { convoListContent: TextRenderable }
+) {
+  // input activates when pressed enter, triggers an activity to send the message
+  inputField.on(InputRenderableEvents.ENTER, async () => {
+    const value = inputField.value;
+    console.log("Input value:", value, "idx value:", currentIdx);
+    const chat = chats[currentIdx];
+    if (!chat) {
+      throw new Error(`Chat at index ${currentIdx} not found`);
+    }
+    if (value != "") {
+      await sendMessages(chat, value);
+      await updateConvoList(
+        currentConvoComponent.convoListContent,
+        chat,
+        chat.id._serialized
+      );
+      inputField.value = "";
+    }
+  });
+}
+
+export async function renderWhatsAppUI(
+  wsp: WAWebJS.Client,
+  renderer: CliRenderer,
+  chats: WAWebJS.Chat[]
+) {
+  const { container, chatListComponent, convoContainer } = buildLayout(
+    renderer,
+    chats
+  );
 
   let initialIndex = 8096;
   try {
@@ -56,7 +137,7 @@ export async function renderWhatsAppUI(
   let currentConvoComponent = await renderConvoList(
     renderer,
     chats,
-    initialIndex,
+    initialIndex
   );
 
   convoContainer.add(currentConvoComponent.scrollComponent);
@@ -64,48 +145,9 @@ export async function renderWhatsAppUI(
   let currentIdx = initialIndex;
   const inputField = await convoInput(renderer);
 
-  // re-rendering the whole convo component
-  wsp.on("message_create", async (message) => {
-    // Add incoming message to the cache first so it's fresh
-    const chatMessageId = message.fromMe ? message.to : message.from;
+  registerMessageEvents(wsp, chats, currentIdx, currentConvoComponent);
 
-    // Skip caching our own messages here since `sendMessages` already cached it on ENTER
-    if (!message.fromMe) {
-      await addMessageToCache(message, chatMessageId);
-    }
-
-    const currentChatId = chats[currentIdx]?.id._serialized;
-    const isRelevant = chatMessageId === currentChatId;
-
-    if (isRelevant) {
-      const chat = chats[currentIdx];
-      if (chat) {
-        await updateConvoList(
-          currentConvoComponent.convoListContent,
-          chat,
-          currentChatId,
-        );
-      }
-    }
-  });
-
-  // input activates when pressed enter, triggers an activity to send the message
-  inputField.on(InputRenderableEvents.ENTER, async (value) => {
-    console.log("Input value:", value, "idx value:", currentIdx);
-    const chat = chats[currentIdx];
-    if (!chat) {
-      throw new Error(`Chat at index ${currentIdx} not found`);
-    }
-    if (value != "") {
-      await sendMessages(chat, value);
-      await updateConvoList(
-        currentConvoComponent.convoListContent,
-        chat,
-        chat.id._serialized,
-      );
-      inputField.value = "";
-    }
-  });
+  registerUIEvents(inputField, chats, currentIdx, currentConvoComponent);
 
   // changing the chat that is selected
   chatListComponent.on(
@@ -130,18 +172,22 @@ export async function renderWhatsAppUI(
       currentConvoComponent = await renderConvoList(
         renderer,
         chats,
-        currentIdx,
+        currentIdx
       );
       await initializeChat(chat.id._serialized, currentConvoComponent.messages);
 
       // adds the convo component and the input again in order so that input is added down only
       convoContainer.add(currentConvoComponent.scrollComponent);
       convoContainer.add(inputField);
-    },
+    }
   );
 
   container.add(convoContainer);
   renderer.root.add(container);
 
-  setupKeyboardInput(renderer, { inputField, chatListComponent });
+  setupKeyboardInput(renderer, {
+    inputField,
+    chatListComponent,
+    onExit: async () => wsp.destroy(),
+  });
 }

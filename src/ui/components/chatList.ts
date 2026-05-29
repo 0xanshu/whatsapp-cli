@@ -4,31 +4,26 @@ import {
   ScrollBoxRenderable,
   TextRenderable,
   InputRenderable,
-  BoxRenderable,
 } from "@opentui/core";
-import { Box, Text, createCliRenderer } from "@opentui/core";
 import type WAWebJS from "whatsapp-web.js";
 import { getChatMessages } from "../../utils/messageCache";
 
-export async function convoInput(renderer: CliRenderer) {
-  const input = new InputRenderable(renderer, {
-    id: "convoInput",
-    width: "100%",
-    marginLeft: 5,
-    marginBottom: 2,
-    placeholder: "Enter your message..",
-  });
-
-  return input;
+function formatMessages(messages: WAWebJS.Message[], chat: WAWebJS.Chat) {
+  return messages
+    .map(
+      (msg) =>
+        `${msg.fromMe ? "Me" : (chat.isGroup ? msg.author : chat.name) || msg.from}: \n${msg.hasMedia ? "Image here.." : msg.body}\n`
+    )
+    .join("\n");
 }
 
 export function renderChatList(
   renderer: CliRenderer,
-  chats: Awaited<ReturnType<WAWebJS.Client["getChats"]>>,
+  chats: Awaited<ReturnType<WAWebJS.Client["getChats"]>>
 ) {
   const selectComponent = new SelectRenderable(renderer, {
     id: "selectComponent",
-    width: "30%",
+    width: "100%",
     height: "100%",
     paddingRight: 5,
     paddingTop: 5,
@@ -44,7 +39,7 @@ export function renderChatList(
 export async function renderConvoList(
   renderer: CliRenderer,
   chats: Awaited<ReturnType<WAWebJS.Client["getChats"]>>,
-  chatIndex: number,
+  chatIndex: number
 ) {
   let messages: WAWebJS.Message[] = [];
 
@@ -72,13 +67,7 @@ export async function renderConvoList(
   }
 
   messages = await chat.fetchMessages({ limit: 100 });
-  const chatContact = chat.name;
-  const chatContent = messages
-    .map(
-      (msg) =>
-        `${msg.fromMe ? "Me" : (chat.isGroup ? msg.author : chatContact) || msg.from}: \n${msg.hasMedia ? "Image here.." : msg.body}\n`,
-    )
-    .join("\n");
+  const chatContent = formatMessages(messages, chat);
 
   const scrollComponent = new ScrollBoxRenderable(renderer, {
     id: "scrollComponent",
@@ -87,7 +76,8 @@ export async function renderConvoList(
     stickyScroll: true,
     stickyStart: "bottom",
     paddingLeft: 5,
-    paddingBottom: 1,
+    paddingBottom: 2,
+    paddingTop: 1,
   });
 
   const convoListContent = new TextRenderable(renderer, {
@@ -102,16 +92,21 @@ export async function renderConvoList(
 export async function updateConvoList(
   textComponent: TextRenderable,
   chat: WAWebJS.Chat,
-  chatID: string,
+  chatID: string
 ): Promise<void> {
   const cachedMessages = await getChatMessages(chatID);
+  const chatContent = formatMessages(cachedMessages, chat);
+  textComponent.content = chatContent;
+}
 
-  const formattedText = cachedMessages
-    .map(
-      (msg) =>
-        `${msg.fromMe ? "Me" : (chat.isGroup ? msg.author : chat.name) || msg.from}: \n${msg.hasMedia ? "Image here.." : msg.body}\n`,
-    )
-    .join("\n");
+export async function convoInput(renderer: CliRenderer) {
+  const input = new InputRenderable(renderer, {
+    id: "convoInput",
+    width: "100%",
+    marginLeft: 5,
+    marginBottom: 1,
+    placeholder: "Enter your message..",
+  });
 
-  textComponent.content = formattedText;
+  return input;
 }

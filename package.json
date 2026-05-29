@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "bun src/index.ts",
+    "format": "prettier --write .",
     "lint": "biome lint ./src"
   },
   "devDependencies": {
@@ -13,6 +14,7 @@
     "@types/node": "^25.0.9",
     "@types/prompts": "^2.4.9",
     "@types/qrcode-terminal": "^0.12.2",
+    "prettier": "^3.8.3",
     "tsx": "^4.21.0"
   },
   "peerDependencies": {

@@ -5,9 +5,9 @@
       "name": "whatsapp-cli",
       "dependencies": {
         "@opentui/core": "^0.1.75",
-        "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js",
         "prompts": "^2.4.2",
         "qrcode-terminal": "^0.12.0",
+        "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js",
       },
       "devDependencies": {
         "@biomejs/biome": "2.4.3",
@@ -15,6 +15,7 @@
         "@types/node": "^25.0.9",
         "@types/prompts": "^2.4.9",
         "@types/qrcode-terminal": "^0.12.2",
+        "prettier": "^3.8.3",
         "tsx": "^4.21.0",
       },
       "peerDependencies": {
@@ -458,6 +459,8 @@
     "planck": ["planck@1.4.2", "", { "peerDependencies": { "stage-js": "^1.0.0-alpha.12" } }, "sha512-mNbhnV3g8X2rwGxzcesjmN8BDA6qfXgQxXVMkWau9MCRlQY0RLNEkyHlVp6yFy/X6qrzAXyNONCnZ1cGDLrNew=="],
 
     "pngjs": ["pngjs@7.0.0", "", {}, "sha512-LKWqWJRhstyYo9pGvgor/ivk2w94eSjE3RGVuzLGlr3NmD8bf7RcYGze1mNdEHRP6TRP6rMuDHk5t44hnTRyow=="],
+
+    "prettier": ["prettier@3.8.3", "", { "bin": { "prettier": "bin/prettier.cjs" } }, "sha512-7igPTM53cGHMW8xWuVTydi2KO233VFiTNyF5hLJqpilHfmn8C8gPf+PS7dUT64YcXFbiMGZxS9pCSxL/Dxm/Jw=="],
 
     "process": ["process@0.11.10", "", {}, "sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A=="],
 

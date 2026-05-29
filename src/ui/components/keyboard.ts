@@ -4,21 +4,21 @@ import type {
   KeyEvent,
   SelectRenderable,
 } from "@opentui/core";
-import wsp from "../../client/whatsapp.ts";
 
 type KeyboardContext = {
   inputField: InputRenderable;
   chatListComponent: SelectRenderable;
+  onExit: () => Promise<void>;
 };
 
 export function setupKeyboardInput(
   renderer: CliRenderer,
-  ctx: KeyboardContext,
+  ctx: KeyboardContext
 ) {
   const keyHandler = renderer.keyInput;
   keyHandler.on("keypress", async (key: KeyEvent) => {
     if (key.ctrl && key.name === "c") {
-      await wsp.destroy();
+      await ctx.onExit();
       process.exit(0);
     }
 

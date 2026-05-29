@@ -5,13 +5,13 @@ const MAX_RETRIES = 5;
 const TIMEOUT = 60000;
 
 export async function listChats(
-  wsp: WAWebJS.Client,
+  wsp: WAWebJS.Client
 ): Promise<WAWebJS.Chat[] | null> {
   let retries = MAX_RETRIES;
 
   while (retries > 0) {
     console.log(
-      `>>> [chat.ts] Fetching chats... (attempt ${MAX_RETRIES - retries + 1}/${MAX_RETRIES})`,
+      `>>> [chat.ts] Fetching chats... (attempt ${MAX_RETRIES - retries + 1}/${MAX_RETRIES})`
     );
 
     try {
@@ -29,7 +29,7 @@ export async function listChats(
       }
     } catch (error) {
       console.log(
-        `>>> [chat.ts] Attempt ${MAX_RETRIES - retries + 1}/${MAX_RETRIES} failed: ${error}`,
+        `>>> [chat.ts] Attempt ${MAX_RETRIES - retries + 1}/${MAX_RETRIES} failed: ${error}`
       );
     }
 
@@ -44,7 +44,7 @@ export async function listChats(
 
 export async function sendMessages(
   chat: WAWebJS.Chat,
-  value: string,
+  value: string
 ): Promise<void> {
   const sentMessage = await chat.sendMessage(value);
   await addMessageToCache(sentMessage, chat.id._serialized);
