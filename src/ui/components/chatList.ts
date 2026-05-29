@@ -75,7 +75,8 @@ export async function renderConvoList(
     height: "auto",
     stickyScroll: true,
     stickyStart: "bottom",
-    paddingLeft: 5,
+    paddingLeft: 4,
+    paddingRight: 4,
     paddingBottom: 2,
     paddingTop: 1,
   });

@@ -58,8 +58,10 @@ function buildLayout(renderer: CliRenderer, chats: WAWebJS.Chat[]) {
 function registerMessageEvents(
   wsp: WAWebJS.Client,
   chats: WAWebJS.Chat[],
-  chatIndex: number,
-  currentConvoComponent: { convoListContent: TextRenderable }
+  state: {
+    currentIdx: number;
+    currentConvoComponent: { convoListContent: TextRenderable };
+  }
 ) {
   wsp.on("message_create", async (message) => {
     const chatMessageId = message.fromMe ? message.to : message.from;
@@ -68,14 +70,14 @@ function registerMessageEvents(
       await addMessageToCache(message, chatMessageId);
     }
 
-    const currentChatId = chats[chatIndex]?.id._serialized;
+    const currentChatId = chats[state.currentIdx]?.id._serialized;
     const isRelevant = chatMessageId === currentChatId;
 
     if (isRelevant) {
-      const chat = chats[chatIndex];
+      const chat = chats[state.currentIdx];
       if (chat) {
         await updateConvoList(
-          currentConvoComponent.convoListContent,
+          state.currentConvoComponent.convoListContent,
           chat,
           currentChatId
         );
@@ -87,21 +89,23 @@ function registerMessageEvents(
 function registerUIEvents(
   inputField: InputRenderable,
   chats: WAWebJS.Chat[],
-  currentIdx: number,
-  currentConvoComponent: { convoListContent: TextRenderable }
+  state: {
+    currentIdx: number;
+    currentConvoComponent: { convoListContent: TextRenderable };
+  }
 ) {
   // input activates when pressed enter, triggers an activity to send the message
   inputField.on(InputRenderableEvents.ENTER, async () => {
     const value = inputField.value;
-    console.log("Input value:", value, "idx value:", currentIdx);
-    const chat = chats[currentIdx];
+    const chat = chats[state.currentIdx];
+
     if (!chat) {
-      throw new Error(`Chat at index ${currentIdx} not found`);
+      throw new Error(`Chat at index ${state.currentIdx} not found`);
     }
     if (value != "") {
       await sendMessages(chat, value);
       await updateConvoList(
-        currentConvoComponent.convoListContent,
+        state.currentConvoComponent.convoListContent,
         chat,
         chat.id._serialized
       );
@@ -120,7 +124,7 @@ export async function renderWhatsAppUI(
     chats
   );
 
-  let initialIndex = 8096;
+  let initialIndex = -1;
   try {
     const si = (chatListComponent as SelectRenderable).selectedIndex;
     if (typeof si === "number") initialIndex = si;
@@ -140,21 +144,32 @@ export async function renderWhatsAppUI(
     initialIndex
   );
 
+  const initialChat = chats[initialIndex];
+  if (initialChat) {
+    await initializeChat(
+      initialChat.id._serialized,
+      currentConvoComponent.messages
+    );
+  }
+
   convoContainer.add(currentConvoComponent.scrollComponent);
 
   let currentIdx = initialIndex;
   const inputField = await convoInput(renderer);
 
-  registerMessageEvents(wsp, chats, currentIdx, currentConvoComponent);
+  const state = {
+    currentIdx: initialIndex,
+    currentConvoComponent,
+  };
 
-  registerUIEvents(inputField, chats, currentIdx, currentConvoComponent);
+  registerMessageEvents(wsp, chats, state);
+
+  registerUIEvents(inputField, chats, state);
 
   // changing the chat that is selected
   chatListComponent.on(
     SelectRenderableEvents.ITEM_SELECTED,
     async (index: number) => {
-      console.log(">>> SELECT EVENT FIRED with index:", index);
-
       convoContainer.remove("scrollComponent");
       convoContainer.remove("convoInput");
 
@@ -162,6 +177,8 @@ export async function renderWhatsAppUI(
         typeof index === "number"
           ? Math.max(0, Math.min(index, chats.length - 1))
           : 0;
+
+      state.currentIdx = currentIdx;
 
       const chat = chats[currentIdx];
       if (!chat) {
@@ -174,6 +191,7 @@ export async function renderWhatsAppUI(
         chats,
         currentIdx
       );
+      state.currentConvoComponent = currentConvoComponent;
       await initializeChat(chat.id._serialized, currentConvoComponent.messages);
 
       // adds the convo component and the input again in order so that input is added down only
