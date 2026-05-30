@@ -1,6 +1,5 @@
 import ww from "whatsapp-web.js";
 import qr from "qrcode-terminal";
-import { welcomeArt } from "./welcomeScreen";
 
 let client: ww.Client;
 try {
@@ -54,8 +53,6 @@ try {
   throw error;
 }
 
-welcomeArt();
-
 client.on("qr", (qrCode) => {
   console.log(">>> [whatsapp.ts] QR Code received, please scan...");
   qr.generate(qrCode, { small: true });
@@ -78,3 +75,14 @@ client.on("auth_failure", (message) => {
 });
 
 export default client;
+
+export function startConnectionWatchdog(isReady: () => boolean) {
+  setTimeout(() => {
+    if (!isReady()) {
+      console.error(
+        ">>> [index.ts] WhatsApp client failed to initialize within 60 seconds, TRY AGAIN!"
+      );
+      process.exit(1);
+    }
+  }, 120000);
+}

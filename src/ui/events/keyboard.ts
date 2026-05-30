@@ -17,6 +17,14 @@ export function setupKeyboardInput(
 ) {
   const keyHandler = renderer.keyInput;
   keyHandler.on("keypress", async (key: KeyEvent) => {
+    if (key.name === "`") {
+      renderer.console.toggle();
+    }
+
+    if (key.ctrl && key.name === "l") {
+      renderer.console.toggle();
+    }
+
     if (key.ctrl && key.name === "c") {
       await ctx.onExit();
       process.exit(0);

@@ -1,22 +1,22 @@
 import {
-  renderChatList,
-  renderConvoList,
-  convoInput,
-  updateConvoList,
-} from "./chatList.ts";
-import {
   BoxRenderable,
   type CliRenderer,
   type SelectRenderable,
   SelectRenderableEvents,
-  InputRenderableEvents,
-  TextRenderable,
-  InputRenderable,
 } from "@opentui/core";
 import type WAWebJS from "whatsapp-web.js";
-import { setupKeyboardInput } from "./keyboard.ts";
+import { setupKeyboardInput } from "../events/keyboard.ts";
 import { sendMessages } from "../../chat.ts";
 import { initializeChat, addMessageToCache } from "../../utils/messageCache.ts";
+import { renderChatList } from "./sidebar.ts";
+import { renderConvoList } from "./conversationBox.ts";
+import { convoInput } from "./messageInput.ts";
+import {
+  registerMessageEvents,
+  registerUIEvents,
+} from "../events/messageHandlers.ts";
+import { state } from "../../state/appState.ts";
+import { handleChatSelectionChange } from "../events/chatSelection.ts";
 
 function buildLayout(renderer: CliRenderer, chats: WAWebJS.Chat[]) {
   const container = new BoxRenderable(renderer, {
@@ -53,65 +53,6 @@ function buildLayout(renderer: CliRenderer, chats: WAWebJS.Chat[]) {
   container.add(chatListContainer);
 
   return { container, chatListComponent, convoContainer };
-}
-
-function registerMessageEvents(
-  wsp: WAWebJS.Client,
-  chats: WAWebJS.Chat[],
-  state: {
-    currentIdx: number;
-    currentConvoComponent: { convoListContent: TextRenderable };
-  }
-) {
-  wsp.on("message_create", async (message) => {
-    const chatMessageId = message.fromMe ? message.to : message.from;
-
-    if (!message.fromMe) {
-      await addMessageToCache(message, chatMessageId);
-    }
-
-    const currentChatId = chats[state.currentIdx]?.id._serialized;
-    const isRelevant = chatMessageId === currentChatId;
-
-    if (isRelevant) {
-      const chat = chats[state.currentIdx];
-      if (chat) {
-        await updateConvoList(
-          state.currentConvoComponent.convoListContent,
-          chat,
-          currentChatId
-        );
-      }
-    }
-  });
-}
-
-function registerUIEvents(
-  inputField: InputRenderable,
-  chats: WAWebJS.Chat[],
-  state: {
-    currentIdx: number;
-    currentConvoComponent: { convoListContent: TextRenderable };
-  }
-) {
-  // input activates when pressed enter, triggers an activity to send the message
-  inputField.on(InputRenderableEvents.ENTER, async () => {
-    const value = inputField.value;
-    const chat = chats[state.currentIdx];
-
-    if (!chat) {
-      throw new Error(`Chat at index ${state.currentIdx} not found`);
-    }
-    if (value != "") {
-      await sendMessages(chat, value);
-      await updateConvoList(
-        state.currentConvoComponent.convoListContent,
-        chat,
-        chat.id._serialized
-      );
-      inputField.value = "";
-    }
-  });
 }
 
 export async function renderWhatsAppUI(
@@ -157,10 +98,8 @@ export async function renderWhatsAppUI(
   let currentIdx = initialIndex;
   const inputField = await convoInput(renderer);
 
-  const state = {
-    currentIdx: initialIndex,
-    currentConvoComponent,
-  };
+  state.currentIdx = initialIndex;
+  state.currentConvoComponent = currentConvoComponent;
 
   registerMessageEvents(wsp, chats, state);
 
@@ -170,33 +109,14 @@ export async function renderWhatsAppUI(
   chatListComponent.on(
     SelectRenderableEvents.ITEM_SELECTED,
     async (index: number) => {
-      convoContainer.remove("scrollComponent");
-      convoContainer.remove("convoInput");
-
-      currentIdx =
-        typeof index === "number"
-          ? Math.max(0, Math.min(index, chats.length - 1))
-          : 0;
-
-      state.currentIdx = currentIdx;
-
-      const chat = chats[currentIdx];
-      if (!chat) {
-        console.log(">>> SELECTED CHAT IS NOT DEFINED");
-        return;
-      }
-
-      currentConvoComponent = await renderConvoList(
+      await handleChatSelectionChange(
+        index,
         renderer,
         chats,
-        currentIdx
+        state,
+        convoContainer,
+        inputField
       );
-      state.currentConvoComponent = currentConvoComponent;
-      await initializeChat(chat.id._serialized, currentConvoComponent.messages);
-
-      // adds the convo component and the input again in order so that input is added down only
-      convoContainer.add(currentConvoComponent.scrollComponent);
-      convoContainer.add(inputField);
     }
   );
 
