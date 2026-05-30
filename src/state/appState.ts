@@ -3,13 +3,11 @@ import type WAWebJS from "whatsapp-web.js";
 
 export const state: {
   currentIdx: number;
-  currentConvoComponent:
-    | {
-        convoListContent: TextRenderable;
-        scrollComponent?: ScrollBoxRenderable;
-        messages?: WAWebJS.Message[];
-      }
-    | any;
+  currentConvoComponent: {
+    convoListContent: TextRenderable;
+    scrollComponent?: ScrollBoxRenderable;
+    messages?: WAWebJS.Message[];
+  } | null;
 } = {
   currentIdx: 0,
   currentConvoComponent: null,

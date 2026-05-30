@@ -6,17 +6,16 @@ import {
 } from "@opentui/core";
 import type WAWebJS from "whatsapp-web.js";
 import { setupKeyboardInput } from "../events/keyboard.ts";
-import { sendMessages } from "../../chat.ts";
-import { initializeChat, addMessageToCache } from "../../utils/messageCache.ts";
+import { initializeChat } from "../../utils/messageCache.ts";
 import { renderChatList } from "./sidebar.ts";
 import { renderConvoList } from "./conversationBox.ts";
 import { convoInput } from "./messageInput.ts";
 import {
   registerMessageEvents,
   registerUIEvents,
-} from "../events/messageHandlers.ts";
+} from "../../handlers/messageHandlers.ts";
 import { state } from "../../state/appState.ts";
-import { handleChatSelectionChange } from "../events/chatSelection.ts";
+import { handleChatSelectionChange } from "../../handlers/chatSelection.ts";
 
 function buildLayout(renderer: CliRenderer, chats: WAWebJS.Chat[]) {
   const container = new BoxRenderable(renderer, {
@@ -79,7 +78,7 @@ export async function renderWhatsAppUI(
     initialIndex = 0;
   }
 
-  let currentConvoComponent = await renderConvoList(
+  const currentConvoComponent = await renderConvoList(
     renderer,
     chats,
     initialIndex
@@ -95,7 +94,6 @@ export async function renderWhatsAppUI(
 
   convoContainer.add(currentConvoComponent.scrollComponent);
 
-  let currentIdx = initialIndex;
   const inputField = await convoInput(renderer);
 
   state.currentIdx = initialIndex;

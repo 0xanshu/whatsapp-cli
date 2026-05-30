@@ -4,7 +4,7 @@ import {
   TextRenderable,
 } from "@opentui/core";
 import type WAWebJS from "whatsapp-web.js";
-import { formatMessages } from "../chatList";
+import { formatMessages } from "./chatList";
 
 export async function renderConvoList(
   renderer: CliRenderer,

@@ -1,6 +1,6 @@
-import { TextRenderable } from "@opentui/core";
+import type { TextRenderable } from "@opentui/core";
 import type WAWebJS from "whatsapp-web.js";
-import { getChatMessages } from "../utils/messageCache";
+import { getChatMessages } from "../../utils/messageCache";
 
 export function formatMessages(
   messages: WAWebJS.Message[],

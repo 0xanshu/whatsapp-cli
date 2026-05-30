@@ -80,7 +80,7 @@ export function startConnectionWatchdog(isReady: () => boolean) {
   setTimeout(() => {
     if (!isReady()) {
       console.error(
-        ">>> [index.ts] WhatsApp client failed to initialize within 60 seconds, TRY AGAIN!"
+        ">>> [index.ts] WhatsApp client failed to initialize within 120 seconds, TRY AGAIN!"
       );
       process.exit(1);
     }

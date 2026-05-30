@@ -1,13 +1,18 @@
-import type { CliRenderer, BoxRenderable, InputRenderable } from "@opentui/core";
+import type {
+  CliRenderer,
+  BoxRenderable,
+  InputRenderable,
+} from "@opentui/core";
 import type WAWebJS from "whatsapp-web.js";
-import { renderConvoList } from "../components/conversationBox.ts";
-import { initializeChat } from "../../utils/messageCache.ts";
+import { renderConvoList } from "../ui/components/conversationBox.ts";
+import { initializeChat } from "../utils/messageCache.ts";
+import type { state as AppState } from "../state/appState.ts";
 
 export async function handleChatSelectionChange(
   index: number,
   renderer: CliRenderer,
   chats: WAWebJS.Chat[],
-  state: any,
+  state: typeof AppState,
   convoContainer: BoxRenderable,
   inputField: InputRenderable
 ) {
@@ -23,7 +28,7 @@ export async function handleChatSelectionChange(
 
   const chat = chats[currentIdx];
   if (!chat) {
-    console.log(">>> SELECTED CHAT IS NOT DEFINED");
+    console.log(">>> [chatSelection.ts] selected chat is not defined");
     return;
   }
 

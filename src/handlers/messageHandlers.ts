@@ -1,16 +1,14 @@
 import type WAWebJS from "whatsapp-web.js";
-import { type TextRenderable, type InputRenderable, InputRenderableEvents } from "@opentui/core";
-import { updateConvoList } from "../chatList.ts";
-import { addMessageToCache } from "../../utils/messageCache.ts";
-import { sendMessages } from "../../chat.ts";
+import { type InputRenderable, InputRenderableEvents } from "@opentui/core";
+import { updateConvoList } from "../ui/components/chatList.ts";
+import { addMessageToCache } from "../utils/messageCache.ts";
+import { sendMessages } from "../chat.ts";
+import type { state as AppState } from "../state/appState.ts";
 
 export function registerMessageEvents(
   wsp: WAWebJS.Client,
   chats: WAWebJS.Chat[],
-  state: {
-    currentIdx: number;
-    currentConvoComponent: { convoListContent: TextRenderable };
-  }
+  state: typeof AppState
 ) {
   wsp.on("message_create", async (message) => {
     const chatMessageId = message.fromMe ? message.to : message.from;
@@ -24,7 +22,7 @@ export function registerMessageEvents(
 
     if (isRelevant) {
       const chat = chats[state.currentIdx];
-      if (chat) {
+      if (chat && state.currentConvoComponent?.convoListContent) {
         await updateConvoList(
           state.currentConvoComponent.convoListContent,
           chat,
@@ -38,10 +36,7 @@ export function registerMessageEvents(
 export function registerUIEvents(
   inputField: InputRenderable,
   chats: WAWebJS.Chat[],
-  state: {
-    currentIdx: number;
-    currentConvoComponent: { convoListContent: TextRenderable };
-  }
+  state: typeof AppState
 ) {
   // input activates when pressed enter, triggers an activity to send the message
   inputField.on(InputRenderableEvents.ENTER, async () => {
@@ -51,7 +46,7 @@ export function registerUIEvents(
     if (!chat) {
       throw new Error(`Chat at index ${state.currentIdx} not found`);
     }
-    if (value !== "") {
+    if (value !== "" && state.currentConvoComponent?.convoListContent) {
       await sendMessages(chat, value);
       await updateConvoList(
         state.currentConvoComponent.convoListContent,
