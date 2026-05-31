@@ -1,6 +1,6 @@
 import wsp, { startConnectionWatchdog } from "./client/whatsapp.ts";
 import { welcomeArt } from "./client/welcomeScreen.ts";
-import { listChats } from "./chat.ts";
+import { listChats } from "./client/chatService.ts";
 import { createOpenTuiApp } from "./ui/screen.ts";
 import { renderWhatsAppUI } from "./ui/components/layout.ts";
 
