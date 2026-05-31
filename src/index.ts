@@ -1,7 +1,10 @@
-import wsp from "./client/whatsapp.ts";
-import { listChats } from "./chat.ts";
+import wsp, { startConnectionWatchdog } from "./client/whatsapp.ts";
+import { welcomeArt } from "./client/welcomeScreen.ts";
+import { listChats } from "./client/chatService.ts";
 import { createOpenTuiApp } from "./ui/screen.ts";
 import { renderWhatsAppUI } from "./ui/components/layout.ts";
+
+welcomeArt();
 
 let readyFired = false;
 
@@ -21,15 +24,6 @@ wsp.on("ready", async () => {
     console.log(">>> [index.ts] Chats loaded:", chats.length);
 
     const renderer = await createOpenTuiApp();
-    renderer.keyInput.on("keypress", (key) => {
-      if (key.name === "`") {
-        renderer.console.toggle();
-      }
-
-      if (key.ctrl && key.name === "l") {
-        renderer.console.toggle();
-      }
-    });
 
     await renderWhatsAppUI(wsp, renderer, chats);
     renderer.start();
@@ -44,11 +38,4 @@ wsp.on("ready", async () => {
 
 wsp.initialize();
 
-setTimeout(() => {
-  if (!readyFired) {
-    console.error(
-      ">>> [index.ts] WhatsApp client failed to initialize within 60 seconds, TRY AGAIN!"
-    );
-    process.exit(1);
-  }
-}, 120000);
+startConnectionWatchdog(() => readyFired);

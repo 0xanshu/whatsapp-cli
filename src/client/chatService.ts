@@ -1,5 +1,5 @@
 import type WAWebJS from "whatsapp-web.js";
-import { addMessageToCache } from "./utils/messageCache";
+import { addMessageToCache } from "../utils/messageCache";
 
 const MAX_RETRIES = 5;
 const TIMEOUT = 60000;

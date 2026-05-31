@@ -1,6 +1,6 @@
 import type WAWebJS from "whatsapp-web.js";
 
-let messageCache = new Map<string, WAWebJS.Message[]>();
+const messageCache = new Map<string, WAWebJS.Message[]>();
 const MAX_CACHED_CHATS = 20;
 const MAX_MESSAGES_PER_CHAT = 200;
 
