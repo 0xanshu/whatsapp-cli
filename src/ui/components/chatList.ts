@@ -17,7 +17,7 @@ export function formatMessages(
 
     const body = msg.hasMedia ? "Image here.." : msg.body;
 
-    return t`${bold(fg(sender === "Me" ? blue : green)(sender ?? ""))}: \n${dim(body ?? "")}\n\n`;
+    return t`${bold(fg(sender === "Me" ? blue : green)(sender as string))}: \n${dim(body ?? "")}\n\n`;
   });
 }
 

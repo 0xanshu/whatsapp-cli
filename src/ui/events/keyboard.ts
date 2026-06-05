@@ -1,13 +1,13 @@
 import type {
-  BoxRenderable,
   CliRenderer,
   InputRenderable,
+  SelectRenderable,
   KeyEvent,
 } from "@opentui/core";
 
 type KeyboardContext = {
   inputField: InputRenderable;
-  chatListContainer: BoxRenderable;
+  chatListComponent: SelectRenderable;
   onExit: () => Promise<void>;
 };
 
@@ -36,7 +36,7 @@ export function setupKeyboardInput(
     }
 
     if (key.ctrl && key.name === "d") {
-      ctx.chatListContainer.focus();
+      ctx.chatListComponent.focus();
       console.log("the focus is on chat list now..");
     }
 
@@ -46,7 +46,7 @@ export function setupKeyboardInput(
     }
 
     if (key.name === "left") {
-      ctx.chatListContainer.focus();
+      ctx.chatListComponent.focus();
       console.log("the focus is on chat list now..");
     }
   });
