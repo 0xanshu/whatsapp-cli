@@ -20,7 +20,6 @@ try {
         "--disable-extensions",
         "--disable-software-rasterizer",
         "--disable-features=site-per-process",
-        "--single-process",
         "--disable-renderer-backgrounding",
         "--disable-background-timer-throttling",
         "--disable-backgrounding-occluded-windows",

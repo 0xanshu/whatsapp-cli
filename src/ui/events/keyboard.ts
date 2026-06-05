@@ -1,8 +1,8 @@
 import type {
   CliRenderer,
   InputRenderable,
-  KeyEvent,
   SelectRenderable,
+  KeyEvent,
 } from "@opentui/core";
 
 type KeyboardContext = {
