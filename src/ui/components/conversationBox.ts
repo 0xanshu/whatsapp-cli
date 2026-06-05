@@ -53,8 +53,16 @@ export async function renderConvoList(
 
   const convoListContent = new TextRenderable(renderer, {
     id: "convoChats",
-    content: chatContent || "No messages in here..",
   });
+
+  if (chatContent.length === 0) {
+    convoListContent.add("No messages in here..");
+  } else {
+    for (const styledMsg of chatContent) {
+      convoListContent.add(styledMsg);
+    }
+  }
+
   scrollComponent.add(convoListContent);
 
   return { scrollComponent, convoListContent, messages };

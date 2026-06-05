@@ -51,7 +51,7 @@ function buildLayout(renderer: CliRenderer, chats: WAWebJS.Chat[]) {
   chatListContainer.add(chatListComponent);
   container.add(chatListContainer);
 
-  return { container, chatListComponent, convoContainer };
+  return { container, chatListComponent, convoContainer, chatListContainer };
 }
 
 export async function renderWhatsAppUI(
@@ -59,7 +59,7 @@ export async function renderWhatsAppUI(
   renderer: CliRenderer,
   chats: WAWebJS.Chat[]
 ) {
-  const { container, chatListComponent, convoContainer } = buildLayout(
+  const { container, chatListComponent, convoContainer, chatListContainer } = buildLayout(
     renderer,
     chats
   );
@@ -123,7 +123,7 @@ export async function renderWhatsAppUI(
 
   setupKeyboardInput(renderer, {
     inputField,
-    chatListComponent,
+    chatListContainer,
     onExit: async () => wsp.destroy(),
   });
 }
