@@ -1,6 +1,6 @@
 import type WAWebJS from "whatsapp-web.js";
 import { type InputRenderable, InputRenderableEvents } from "@opentui/core";
-import { updateConvoList } from "../ui/components/chatList.ts";
+import { updateConvoList } from "../ui/components/messageRenderer.ts";
 import { addMessageToCache } from "../utils/messageCache.ts";
 import { sendMessages } from "../client/chatService.ts";
 import type { state as AppState } from "../state/appState.ts";

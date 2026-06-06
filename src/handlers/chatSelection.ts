@@ -39,6 +39,8 @@ export async function handleChatSelectionChange(
   );
   state.currentConvoComponent = currentConvoComponent;
   await initializeChat(chat.id._serialized, currentConvoComponent.messages);
+  convoContainer.title =
+    " " + chat.name + " " || " " + chat.id._serialized + " " || "";
 
   // adds the convo component and the input again in order so that input is added down only
   convoContainer.add(currentConvoComponent.scrollComponent);
