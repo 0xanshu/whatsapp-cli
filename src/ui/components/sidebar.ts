@@ -15,6 +15,7 @@ export function renderChatList(
     options: chats.map((chat) => ({
       name: chat.name || chat.id.user || "Unknown",
       description: "",
+      value: chat.id._serialized,
     })),
   });
   return selectComponent;

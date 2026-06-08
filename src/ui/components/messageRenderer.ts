@@ -10,15 +10,29 @@ export function formatMessages(
   messages: WAWebJS.Message[],
   chat: WAWebJS.Chat
 ) {
-  return messages.map((msg) => {
-    const sender = msg.fromMe
-      ? "Me"
-      : (chat.isGroup ? msg.author : chat.name) || msg.from;
+  return Promise.all(
+    messages.map(async (msg) => {
+      let sender: string;
 
-    const body = msg.hasMedia ? "Image here.." : msg.body;
+      if (msg.fromMe) {
+        sender = "Me";
+      } else if (chat.isGroup) {
+        const contact = await msg.getContact();
+        sender =
+          contact.pushname ||
+          contact.name ||
+          contact.number ||
+          msg.author ||
+          msg.from;
+      } else {
+        sender = chat.name;
+      }
 
-    return t`${bold(fg(sender === "Me" ? blue : green)(sender as string))}: \n${dim(body ?? "")}\n\n`;
-  });
+      const body = msg.hasMedia ? "Image here.." : msg.body;
+
+      return t`${bold(fg(sender === "Me" ? blue : green)(sender as string))}: \n${dim(body ?? "")}\n\n`;
+    })
+  );
 }
 
 export async function updateConvoList(
@@ -27,7 +41,7 @@ export async function updateConvoList(
   chatID: string
 ): Promise<void> {
   const cachedMessages = await getChatMessages(chatID);
-  const styledMessages = formatMessages(cachedMessages, chat);
+  const styledMessages = await formatMessages(cachedMessages, chat);
   textComponent.clear();
   for (const styledMsg of styledMessages) {
     textComponent.add(styledMsg);

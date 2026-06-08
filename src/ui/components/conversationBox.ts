@@ -37,7 +37,7 @@ export async function renderConvoList(
   }
 
   messages = await chat.fetchMessages({ limit: 100 });
-  const chatContent = formatMessages(messages, chat);
+  const chatContent = await formatMessages(messages, chat);
 
   const scrollComponent = new ScrollBoxRenderable(renderer, {
     id: "scrollComponent",
