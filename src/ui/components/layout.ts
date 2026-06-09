@@ -42,7 +42,7 @@ function buildLayout(renderer: CliRenderer, chats: WAWebJS.Chat[]) {
     border: true,
     borderColor: "gray",
     borderStyle: "rounded",
-    title: "Chat List",
+    title: " Chat List ",
     titleAlignment: "left",
   });
 

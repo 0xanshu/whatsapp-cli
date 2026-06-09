@@ -4,7 +4,7 @@ import {
   TextRenderable,
 } from "@opentui/core";
 import type WAWebJS from "whatsapp-web.js";
-import { formatMessages } from "./chatList";
+import { formatMessages } from "./messageRenderer";
 
 export async function renderConvoList(
   renderer: CliRenderer,
@@ -37,7 +37,7 @@ export async function renderConvoList(
   }
 
   messages = await chat.fetchMessages({ limit: 100 });
-  const chatContent = formatMessages(messages, chat);
+  const chatContent = await formatMessages(messages, chat);
 
   const scrollComponent = new ScrollBoxRenderable(renderer, {
     id: "scrollComponent",

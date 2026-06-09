@@ -14,7 +14,8 @@ export function renderChatList(
     itemSpacing: 1,
     options: chats.map((chat) => ({
       name: chat.name || chat.id.user || "Unknown",
-      description: chat.lastMessage?.body || "No messages yet",
+      description: "",
+      value: chat.id._serialized,
     })),
   });
   return selectComponent;
